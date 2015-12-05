@@ -11,7 +11,7 @@ floor = 0
 
 
 # Usually in Python I'd do somethind like 'for c in s' to mean :
-#   for each character in string s, do something
+#   for each character c in string s, do something
 #
 # But using enumate(string), not only do we get the character but
 # we also get an index i so we know where we are in the string.
