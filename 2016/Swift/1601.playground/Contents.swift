@@ -1,6 +1,30 @@
 import Foundation
 
 
+enum Orientation: Int, CustomStringConvertible {
+    case North = 0
+    case East
+    case South
+    case West
+    
+    //
+    // CustomStringConvertible
+    //
+    var description: String {
+        switch self {
+        case .North : return "North"
+        case .East  : return "East"
+        case .South : return "South"
+        case .West  : return "West"
+        }
+    }
+}
+
+enum Direction: Int {
+    case Left
+    case Right
+}
+
 class Point : Hashable, CustomStringConvertible {
     var x: Int = 0
     var y: Int = 0
@@ -13,6 +37,15 @@ class Point : Hashable, CustomStringConvertible {
     init(_ p:Point) {
         self.x = p.x
         self.y = p.y
+    }
+
+    func walk(_ orientation:Orientation) {
+        switch orientation {
+            case .North : y = y + 1
+            case .South : y = y - 1
+            case .East  : x = x + 1
+            case .West  : x = x - 1
+        }
     }
     
     func distance() -> Int {
@@ -39,29 +72,6 @@ class Point : Hashable, CustomStringConvertible {
     var description: String { return "(" + String(x) + "," + String(y) + ")" }
 }
 
-enum Orientation: Int, CustomStringConvertible {
-    case North = 0
-    case East
-    case South
-    case West
-
-    //
-    // CustomStringConvertible
-    //
-    var description: String {
-        switch self {
-        case .North : return "North"
-        case .East  : return "East"
-        case .South : return "South"
-        case .West  : return "West"
-        }
-    }
-}
-
-enum Direction: Int {
-    case Left
-    case Right
-}
 
 class Heading: CustomStringConvertible {
     
@@ -116,12 +126,7 @@ func AoC1601(_ path:String) {
         
         for _ in 0..<len {
             
-            switch heading.orientation {
-                case .North: pos.y = pos.y + 1
-                case .South: pos.y = pos.y - 1
-                case .East: pos.x = pos.x + 1
-                case .West: pos.x = pos.x - 1
-            }
+            pos.walk(heading.orientation)
             
             if prevPositions.contains(pos) {
                 print("Duplicate Position")
