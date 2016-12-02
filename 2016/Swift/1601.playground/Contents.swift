@@ -34,51 +34,93 @@ class Point : Hashable, CustomStringConvertible {
     }
 
     //
-    // Printable
+    // CustomStringConvertible
     //
     var description: String { return "(" + String(x) + "," + String(y) + ")" }
 }
 
-func AoC1601(_ path:String) {
+enum Orientation: Int, CustomStringConvertible {
+    case North = 0
+    case East
+    case South
+    case West
+
+    //
+    // CustomStringConvertible
+    //
+    var description: String {
+        switch self {
+        case .North : return "North"
+        case .East  : return "East"
+        case .South : return "South"
+        case .West  : return "West"
+        }
+    }
+}
+
+enum Direction: Int {
+    case Left
+    case Right
+}
+
+class Heading: CustomStringConvertible {
     
-    enum orientations: Int {
-        case North = 0
-        case East
-        case South
-        case West
+    public var orientation = Orientation.North
+    
+    init(_ orientation:Orientation) {
+        self.orientation = orientation
     }
     
-    let orientationStrings = ["North", "East", "South", "West"]
-    
-    let pos = Point(0,0)
-    
-    var firstDuplicatePosition:Point?
-    
-    var prevPositions = Set<Point>()
-    var orientation = orientations.North
-    
-    for str in path.components(separatedBy: ", ") {
-        
-        let len = Int(String(str.characters.dropFirst()))!
+    func turn(_ direction:Direction) {
         
         var orientationChange = 0
-        if str.hasPrefix("L") {
+        
+        if direction == Direction.Left {
             orientationChange = -1
         } else {
             orientationChange = 1
         }
         
-        orientation = orientations(rawValue:(((orientation.rawValue + orientationChange) + 4) % 4))!
+        orientation = Orientation(rawValue:(((orientation.rawValue + orientationChange) + 4) % 4))!
+        
+    }
+    
+    //
+    // CustomStringConvertible
+    //
+    var description: String {
+        return orientation.description
+    }
+}
+
+func AoC1601(_ path:String) {
+    
+    let pos = Point(0,0)
+    let heading = Heading(.North)
+    
+    var prevPositions = Set<Point>()
+    var firstDuplicatePosition:Point?
+    
+    
+    for str in path.components(separatedBy: ", ") {
+        
+        if str.hasPrefix("L") {
+            heading.turn(Direction.Left)
+        } else {
+            heading.turn(Direction.Right)
+        }
+        
+        let len = Int(String(str.characters.dropFirst()))!
         
         let oldPos = pos
         
         for _ in 0..<len {
             
-            switch orientation {
-                case orientations.North: pos.y = pos.y + 1
-                case orientations.South: pos.y = pos.y - 1
-                case orientations.East: pos.x = pos.x + 1
-                case orientations.West: pos.x = pos.x - 1
+            switch heading.orientation {
+                case .North: pos.y = pos.y + 1
+                case .South: pos.y = pos.y - 1
+                case .East: pos.x = pos.x + 1
+                case .West: pos.x = pos.x - 1
             }
             
             if prevPositions.contains(pos) {
@@ -94,8 +136,7 @@ func AoC1601(_ path:String) {
             
         }
         
-        
-        print("\(oldPos) + \(str) [\(orientationStrings[orientation.rawValue]), \(len)] = \(pos)")
+        print("\(oldPos) + \(str) [\(heading)], \(len)] = \(pos)")
         
     }
     
