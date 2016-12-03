@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'set'
+
 NORTH = 0
 EAST  = 1
 SOUTH = 2
@@ -13,9 +15,15 @@ class Position
   @x = 0
   @y = 0
 
+  attr_reader :x, :y
+
   def initialize(x, y)
     @x = x
     @y = y
+  end
+
+  def self.new_from_pos(pos)
+    self.new(pos.x, pos.y)
   end
 
   def distance
@@ -37,6 +45,18 @@ class Position
 
   def to_s
     return "(#{@x}, #{@y})"
+  end
+
+  #
+  # Comparable
+  #
+
+  def eql?(other)
+    return (@x == other.x) && (@y == other.y)
+  end
+
+  def hash
+    return @x ^ @y
   end
 
 end
@@ -69,6 +89,10 @@ def AoC1601(input)
   position = Position.new(0,0)
   heading = Heading.new(NORTH)
 
+  first_visited_twice = nil
+
+  previous_positions = Set.new []
+
   puts("Position #{position} : Heading #{heading}")
 
   input.split(/\W+/).each do |instruction|
@@ -79,13 +103,28 @@ def AoC1601(input)
 
     for _ in 0..len-1
       position.walk(heading)
+
+      position_copy = Position.new_from_pos(position)
+      if previous_positions.include?(position_copy)
+
+        if first_visited_twice.nil?
+          puts("We've been here already!")
+          first_visited_twice = position_copy
+        end
+
+      else
+        previous_positions.add(position_copy)
+      end
+
+
     end
 
     puts("[#{instruction}] -> Position #{position} : Heading #{heading}")
 
   end
 
-  puts("Total distance is #{position.distance}")
+  puts("\nTotal distance is #{position.distance}")
+  puts("Distance to first house visited twice is #{first_visited_twice.distance}")
 
 end
 
