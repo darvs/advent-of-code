@@ -129,9 +129,9 @@ func AoC1601(_ path:String) {
             pos.walk(heading.orientation)
             
             if prevPositions.contains(pos) {
-                print("Duplicate Position")
                 
                 if firstDuplicatePosition == nil {
+                    print("Duplicate Position")
                     firstDuplicatePosition = Point(pos)
                 }
                 
@@ -141,7 +141,7 @@ func AoC1601(_ path:String) {
             
         }
         
-        print("\(oldPos) + \(str) [\(heading)], \(len)] = \(pos)")
+        print("\(oldPos) + \(str) [\(heading), \(len)] = \(pos)")
         
     }
     
