@@ -63,15 +63,8 @@ end
 
 def AoC1602(keypad, start, input)
 
-  # Our telephone keypad is like this:
-  #
-  #    1 2 3
-  #    4 5 6
-  #    7 8 9
-  #
-  # The 5 key would be the 2nd in X and 2nd in Y.
-  # Counting from 0,0 at the top left, the 5 key would be (1,1)
-  #
+  # We know the key we start on, and we know the
+  # layout of the keypad, so find the starting position
   position = Position.new(keypad, start)
   number = ''
 
