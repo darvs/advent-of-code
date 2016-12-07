@@ -122,7 +122,7 @@ func AoC1601(_ path:String) {
         
         let len = Int(String(str.characters.dropFirst()))!
         
-        let oldPos = pos
+        let oldPos = Point(pos)
         
         for _ in 0..<len {
             
