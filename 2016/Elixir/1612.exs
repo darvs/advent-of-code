@@ -73,7 +73,7 @@ defmodule AoC1612 do
     next_instruction(program, registers)
   end
 
-  def exec(program, registers \\ %{pc: 0, "a": 0, "b": 0, "c": 0, "d": 0} ) do
+  def exec(program, registers) do
       #IO.inspect(["fn", program, registers])
 
       pc = Map.fetch!(registers, :pc)
@@ -90,7 +90,7 @@ defmodule AoC1612 do
       end
   end
 
-  def run(file) do
+  def run(file, puzzle) do
 
     program = File.stream!(file, [:utf8])
       |> Enum.map(&(String.strip/1))
@@ -99,7 +99,11 @@ defmodule AoC1612 do
 
       IO.inspect(["PROGRAM:", program])
 
-      exec(program)
+      case puzzle do
+        :puzzle1 -> exec(program, %{pc: 0, "a": 0, "b": 0, "c": 0, "d": 0})
+        :puzzle2 -> exec(program, %{pc: 0, "a": 0, "b": 0, "c": 1, "d": 0})
+      end
+
   end
 end
 
@@ -107,7 +111,8 @@ end
 
 
 
-#AoC1612.run("1612.test.input")
-#AoC1612.run("1612.test2.input")
+#AoC1612.run("1612.test.input", :puzzle1)
+#AoC1612.run("1612.test2.input", :puzzle2)
 
-AoC1612.run("1612.real.input")
+#AoC1612.run("1612.real.input", :puzzle1)
+AoC1612.run("1612.real.input", :puzzle2)
