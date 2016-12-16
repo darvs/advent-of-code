@@ -45,12 +45,9 @@ defmodule AoC1610 do
 
     IO.puts "Starting time: " <> DateTime.to_string(DateTime.utc_now)
 
-    commands = File.stream!(file, [:utf8])
-                  |> Enum.map(&(String.strip/1))
-                  |> Enum.partition(fn(x) -> Regex.match?(~r/^value/, x) end)
-
-    cmd_value     = elem(commands,0)
-    cmd_transfer  = elem(commands,1)
+    {cmd_value, cmd_transfer} = File.stream!(file, [:utf8])
+                                  |> Enum.map(&(String.strip/1))
+                                  |> Enum.partition(fn(x) -> Regex.match?(~r/^value/, x) end)
 
     IO.inspect(["Value    Commands:", cmd_value])
     IO.inspect(["Transfer Commands:", cmd_transfer])
