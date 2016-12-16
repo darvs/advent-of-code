@@ -52,40 +52,74 @@ defmodule AoC1613 do
   #
   # end
 
-  defp open_neighbors({x,y}, acc, input, destination) do
+  defp open_neighbors(puzzle, {x,y}, acc, input, destination) do
 
     # IO.inspect(["open_neighbors", {x,y}, acc, input, destination])
     # IO.inspect(["open_neighbors", {x,y}])
 
-    if {x,y} == destination do
-      len = Enum.count(acc) - 1
-      #IO.inspect(["Len:", len, Enum.reverse(acc)])
+    cond do
 
-      List.to_tuple(Enum.reverse(acc))
-    else
+      puzzle == :puzzle1 and {x,y} == destination ->
+        #len = Enum.count(acc) - 1
+        #IO.inspect(["Len:", len, Enum.reverse(acc)])
+        List.to_tuple(Enum.reverse(acc))
 
-      list =  neighbors({x, y})
-                |> Enum.filter(fn z -> is_open(z, input) end)
-                |> Enum.filter(fn c -> !Enum.member?(acc, c) end)
 
-    # IO.inspect(["open_neighbors", {x,y}, list])
+      puzzle == :puzzle2 and length(acc) == 50+1 ->
+        List.to_tuple(Enum.reverse(acc))
 
-      path =
-        case list do
-          []  -> []
-          _   -> Enum.map(list, fn p -> open_neighbors(p, [p | acc], input, destination) end) |> Enum.filter(fn q -> q != [] end)
-        end
+      true ->
+
+        list =  neighbors({x, y})
+                  |> Enum.filter(fn z -> is_open(z, input) end)
+                  |> Enum.filter(fn c -> !Enum.member?(acc, c) end)
+
+      # IO.inspect(["open_neighbors", {x,y}, list])
+
+        path =
+          case list do
+            []  ->  if puzzle == :puzzle1, do: [], else: List.to_tuple(Enum.reverse(acc))
+
+            _   -> Enum.map(list, fn p -> open_neighbors(puzzle, p, [p | acc], input, destination) end) |> Enum.filter(fn q -> q != [] end)
+          end
     end
 
   end
 
-  defp open_neighbors(p, input, destination) do
-    open_neighbors(p, [p], input, destination)
+  defp open_neighbors(puzzle, p, input, destination) when puzzle == :puzzle1 do
+
+    IO.puts("-------------------")
+    IO.puts("Puzzle #1")
+    IO.puts("-------------------")
+
+    open_neighbors(puzzle, p, [p], input, destination)
       |> List.flatten
       |> Enum.map(fn x -> Tuple.to_list(x) end)
       |> Enum.map(fn x -> [length(x)-1, x] end)
       |> Enum.sort
+      |> IO.inspect
   end
+
+  defp open_neighbors(puzzle, p, input, destination) when puzzle == :puzzle2 do
+
+    IO.puts("-------------------")
+    IO.puts("Puzzle #2")
+    IO.puts("-------------------")
+
+    n = open_neighbors(puzzle, p, [p], input, destination)
+      |> List.flatten
+      |> Enum.map(fn x -> Tuple.to_list(x) end)
+      |> IO.inspect
+      |> List.flatten
+      |> Enum.uniq
+      |> Enum.sort
+      |> IO.inspect
+      |> Enum.count
+
+    IO.puts("Answer: #{n}")
+
+  end
+
 
 
   # defp open_neighbors(input, list) do
@@ -96,13 +130,13 @@ defmodule AoC1613 do
   # end
 
 
-  def run(input, destination) do
+  def run(puzzle, input, destination) do
 
     IO.puts "Starting time: " <> DateTime.to_string(DateTime.utc_now)
 
-    x = open_neighbors({1,1}, input, destination)
+    open_neighbors(puzzle, {1,1}, input, destination)
 
-    IO.inspect(x)
+    # IO.inspect(x)
 
     # x |> Enum.map(fn x -> IO.inspect(x) end)
 
