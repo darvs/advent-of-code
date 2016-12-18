@@ -1,20 +1,19 @@
 defmodule AoC1618 do
 
-# def its_a_trap("^^."), do: "^"
-# def its_a_trap(".^^"), do: "^"
-# def its_a_trap("^.."), do: "^"
-# def its_a_trap("..^"), do: "^"
-# def its_a_trap(_), do: "."
-
 def process_line(line) do
-  "." <> line <> "."
-    |> String.graphemes
+  line
+    |> Enum.reverse
+    |> (fn line -> ["."] ++ line end).()
+    |> Enum.reverse
+    |> (fn line -> ["."] ++ line end).()
     |> Enum.chunk(3,1)
     |> Enum.reduce([], fn ([a,_,c],acc) -> [(if a != c, do: "^", else: ".")] ++ acc end)
     |> Enum.reverse
-    |> Enum.join
 end
 
+def process_line_debug(line) do
+  process_line(String.graphemes(line)) |> Enum.join
+end
 
 def build(line, 0, acc), do: Enum.reverse([line] ++ acc)
 
@@ -24,12 +23,17 @@ def build(line, n, acc) do
 end
 
 def build(line, n) do
-  build(line, n-1, [])
+  String.graphemes(line) |>
+    build(n-1, [])
+end
+
+def build_debug(line, n) do
+  build(line, n)
+    |> Enum.map(&Enum.join/1)
 end
 
 def count_safe(arr) do
-  Enum.join(arr)
-    |> String.graphemes
+  List.flatten(arr)
     |> Enum.count(fn x -> x == "." end)
 
 end

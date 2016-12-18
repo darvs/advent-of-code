@@ -4,15 +4,15 @@ defmodule AoC1618Test do
   doctest AoC1618
 
   test "Process line #1" do
-    assert process_line("..^^.") == ".^^^^"
+    assert process_line_debug("..^^.") == ".^^^^"
   end
 
   test "Process line #2" do
-    assert process_line(".^^^^") == "^^..^"
+    assert process_line_debug(".^^^^") == "^^..^"
   end
 
   test "Process 3 lines" do
-    assert build("..^^.", 3) ==
+    assert build_debug("..^^.", 3) ==
 
       [ "..^^.",
         ".^^^^",
@@ -20,7 +20,7 @@ defmodule AoC1618Test do
   end
 
   test "Process 10 lines" do
-    assert build(".^^.^.^^^^", 10) ==
+    assert build_debug(".^^.^.^^^^", 10) ==
 
       [ ".^^.^.^^^^",
         "^^^...^..^",
@@ -62,7 +62,8 @@ defmodule AoC1618Test do
   end
 
   # First attempt at test Puzzle #2 took 4903357.6ms, that's 1 hour, 21 minutes and 43 seconds.
-  # Second attempt at test Puzzle #2 took 127601.4ms, that 2 minutes and 8 seconds.
+  # Second attempt at test Puzzle #2 took 127601.4ms, that's 2 minutes and 8 seconds.
+  # Third attempt at test Puzzle #2 took 32220.6ms, that's 32 seconds.
 
   @tag slow: true
   test "Puzzle #2" do
