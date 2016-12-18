@@ -2,13 +2,12 @@ defmodule AoC1618 do
 
 def process_line(line) do
   line
-    |> Enum.reverse
     |> (fn line -> ["."] ++ line end).()
     |> Enum.reverse
     |> (fn line -> ["."] ++ line end).()
+    |> Enum.reverse
     |> Enum.chunk(3,1)
-    |> Enum.reduce([], fn ([a,_,c],acc) -> [(if a != c, do: "^", else: ".")] ++ acc end)
-    |> Enum.reverse
+    |> Enum.map(fn [a,_,c] -> if a != c, do: "^", else: "." end)
 end
 
 def process_line_debug(line) do
