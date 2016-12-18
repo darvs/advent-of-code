@@ -40,13 +40,31 @@ defmodule AoC1618Test do
     assert run(".^^.^.^^^^", 10) == 38
   end
 
+  # First attempt at test Puzzle #1 took 41.4ms
+
   test "Puzzle #1" do
     assert run(".^^..^...^..^^.^^^.^^^.^^^^^^.^.^^^^.^^.^^^^^^.^...^......^...^^^..^^^.....^^^^^^^^^....^^...^^^^..^", 40) == 2005
   end
 
 
-  # First attempt at test Puzzle #2 took (4903357.6ms), that's 1 hour, 21 minutes and 43 seconds.
+  # Benchmarking tests
 
+  test "Puzzle #2 : 1000" do
+    assert run(".^^..^...^..^^.^^^.^^^.^^^^^^.^.^^^^.^^.^^^^^^.^...^......^...^^^..^^^.....^^^^^^^^^....^^...^^^^..^", 1000) == 49898
+  end
+
+  test "Puzzle #2 : 10000" do
+    assert run(".^^..^...^..^^.^^^.^^^.^^^^^^.^.^^^^.^^.^^^^^^.^...^......^...^^^..^^^.....^^^^^^^^^....^^...^^^^..^", 10000) == 500022
+  end
+
+  test "Puzzle #2 : 100000" do
+    assert run(".^^..^...^..^^.^^^.^^^.^^^^^^.^.^^^^.^^.^^^^^^.^...^......^...^^^..^^^.....^^^^^^^^^....^^...^^^^..^", 100000) == 4998606
+  end
+
+  # First attempt at test Puzzle #2 took 4903357.6ms, that's 1 hour, 21 minutes and 43 seconds.
+  # Second attempt at test Puzzle #2 took 127601.4ms, that 2 minutes and 8 seconds.
+
+  @tag slow: true
   test "Puzzle #2" do
     assert run(".^^..^...^..^^.^^^.^^^.^^^^^^.^.^^^^.^^.^^^^^^.^...^......^...^^^..^^^.....^^^^^^^^^....^^...^^^^..^", 400000) == 20008491
   end
