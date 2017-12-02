@@ -5,9 +5,6 @@ def d01 (str, offset_fn)
 			acc += str[i].to_i
 		end
 	end
-	#puts "Input: #{str}"
-	#puts "  Total: #{acc.to_s}"
-
 	acc
 end
 

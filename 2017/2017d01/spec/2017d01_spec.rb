@@ -1,6 +1,6 @@
 require_relative '../lib/2017d01'
 
-puzzle_key = File.read("2017d01.in").strip
+puzzle_key = File.read("data/2017d01.in").strip
 
 describe "Part One" do
 	expected = {
