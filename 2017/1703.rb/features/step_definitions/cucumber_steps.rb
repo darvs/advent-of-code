@@ -5,30 +5,25 @@ When("data starts from square {int}") do |int|
 end
 
 Then("it should reach the center in {int} steps") do |int|
-	steps, _, _ = @square.walk()
+	steps, _ = @square.walk()
 	expect(steps).to eq(int)
 end
 
-When("data is written to square number {int}") do |int|
+When("data is written to square number {int} for the stress test") do |int|
 	@square = Location.new(int)  
 end
 
 Then("the sum of adjacent values should be {int}") do |int|
-	_, sum, _ = @square.walk()
+	_, sum = @square.walk(:stress_test)
 	expect(sum).to eq(int)
 end
 
-Given("a limit value of {int}") do |int|
+Given("a stress test limit value of {int}") do |int|
 	@square = Location.new(0, int)  
 end
 
-Then("we should go over it at square {int}") do |int|
-	_, _, counter = @square.walk()
-	expect(counter).to eq(int)
-end
-
-Then("the first value written over it is {int}") do |int|
-	_, sum, _ = @square.walk()
+Then("the first value written over it during stress test is {int}") do |int|
+	_, sum = @square.walk(:stress_test)
 	expect(sum).to eq(int)
 end
 

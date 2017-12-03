@@ -10,13 +10,13 @@ Feature: A Manhattan Distance calculator (in Taxicab Coordinates)
 		Examples:
 			| square | steps |
 			| 1      | 0     |
-#			| 12     | 3     |
-#			| 23     | 2     |
-#			| 1024   | 31    |
-#			| 289326 | 419   |
+			| 12     | 3     |
+			| 23     | 2     |
+			| 1024   | 31    |
+			| 289326 | 419   |
 
 	Scenario Outline: Calculate values written during the stress test
-		When data is written to square number <square>
+		When data is written to square number <square> for the stress test
 		Then the sum of adjacent values should be <value>
 
 		Examples:
@@ -33,7 +33,7 @@ Feature: A Manhattan Distance calculator (in Taxicab Coordinates)
 
 
 	Scenario Outline: Calculate when values written during the stress test go over a limit
-		Given a limit value of <limit>
+		Given a stress test limit value of <limit>
 		Then the first value written over it is <over>
 
 		Examples:
