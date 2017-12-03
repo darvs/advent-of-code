@@ -27,7 +27,10 @@ end
 def even_division(line)
 	if line.length == 1 then return 0 end
 
+	# Sort the numbers from highest to lowest so we need to test only forward.
 	head, *tail = *line.sort.reverse
+
+	# if head % an-item-of-the-tail is 0, then we found our answer
 	div = tail.map {|x| if head % x == 0 then head/x else 0 end}
 		.select {|x| x > 0}
 
