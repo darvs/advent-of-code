@@ -1,9 +1,9 @@
-Feature: A Manhattan Distance calculator (in Taxicab Coordinates)
+Feature: A Manhattan Distance calculator (Taxicab Coordinates)
 	In an infinite two-dimensional memory grid, 
 	Spiraling from the center without skipping a square,
 	I need to calculate the Manhattan Distance from the center for any square
 
-	Scenario Outline: Calculate the distance for a given square
+	Scenario Outline: Calculate the distance to the center for a given square
 		When data starts from square <square>
 		Then it should reach the center in <steps> steps
 

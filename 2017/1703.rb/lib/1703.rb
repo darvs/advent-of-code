@@ -6,44 +6,33 @@ class Location
 	@@instructions = [:increment_and_turn, :turn]
 
 	def initialize(square, limit = -1)
-		@x = 0
-		@y = 0
+		@pos = [0,0]
 		@distance = square-1
-		@limit = limit
 		@counter = 0 
+		@limit = limit
 		@cur_heading = 0
 		@cur_segment_len = 1
 		@cur_distance_in_segment = 0
 		@cur_instruction = 0
 
 		# default accumulator for first square
-		@squares = Hash.new(0)
-		@squares[[0,0]] = 1
+		@val = Hash.new(0)
+		@val[@pos] = 1
 	end
 
 	def walk(context = :normal)
-		val = 1 # default for first node
 
-		while ((@distance == -1) or (@counter < @distance)) and ((@limit == -1) or (val <= @limit)) do
+		while ((@distance == -1) or (@counter < @distance)) and ((@limit == -1) or (@val[@pos] <= @limit)) do
 
 				# Take one step
 				@cur_distance_in_segment += 1 
 				
-				@x += @@headings[@cur_heading].first
-				@y += @@headings[@cur_heading].drop(1).first
+				@pos = @pos.zip(@@headings[@cur_heading]).map{|x| x.reduce(:+)}
 
 				if context == :stress_test then
-					val = 0
-					# Calaculate value
-					for head in 0..(@@headings.length-1) do
-							new_val = @squares[[@x + @@headings[head].first, @y + @@headings[head].drop(1).first]]
-							val += new_val
-					end
-					for diag in 0..(@@diagonals.length-1) do
-							new_val = @squares[[@x + @@diagonals[diag].first, @y + @@diagonals[diag].drop(1).first]]
-							val += new_val
-					end
-					@squares[[@x, @y]] = val
+
+						@val[@pos] = (@@headings + @@diagonals).map{|direction| @val[@pos.zip(direction).map{|x| x.reduce(:+)}]}.reduce(:+)
+
 				end
 
 				# We have reached the end of this segment
@@ -64,7 +53,10 @@ class Location
 				end
 				@counter += 1
 		end
-		
-		return @x.abs + @y.abs, val
+	
+		manhattan_distance = @pos.first.abs + @pos.drop(1).first.abs
+		stress_test_value = @val[@pos]
+
+		return manhattan_distance, stress_test_value
 	end
 end
