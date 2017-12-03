@@ -22,7 +22,7 @@ Given("a stress test limit value of {int}") do |int|
 	@square = Location.new(0, int)  
 end
 
-Then("the first value written over it during stress test is {int}") do |int|
+Then("the first value written over it should be {int}") do |int|
 	_, sum = @square.walk(:stress_test)
 	expect(sum).to eq(int)
 end

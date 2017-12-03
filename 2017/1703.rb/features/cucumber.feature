@@ -34,7 +34,7 @@ Feature: A Manhattan Distance calculator (in Taxicab Coordinates)
 
 	Scenario Outline: Calculate when values written during the stress test go over a limit
 		Given a stress test limit value of <limit>
-		Then the first value written over it is <over>
+		Then the first value written over it should be <over>
 
 		Examples:
 			| limit  | over   |
