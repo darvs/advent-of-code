@@ -27,5 +27,3 @@ end
 Given("the fact that passphrases must also not contain anagrams") do
 	@check_anagrams = true
 end
-
-
