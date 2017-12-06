@@ -31,12 +31,15 @@ def one_step(banks)
 end
 
 def detect_infinite_loop(banks)
-	set = Set.new
-	map = {}
+	hash = {}
 	loop do
 		banks = one_step(banks)
-		break if not set.add?(banks)
-		map[banks] = set.length
+		break if hash.has_key?(banks)
+		hash[banks] = hash.length+1
 	end
-	return set.length+1, set.length+1-map[banks]
+
+	pos = hash.length+1
+	len = pos - hash[banks]
+
+	return pos, len
 end
