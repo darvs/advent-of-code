@@ -17,9 +17,16 @@ Then("its supported list length is {int}") do |int|
 end
 
 Given("a program list file of {string}") do |string|
-	@programs = read_file(string) 
+	@programs = read_file(string)
 end
 
 Then("the program at the bottom is {string}") do |string|
+	weight(@programs, bottom(@programs))
+	unbalanced(@programs)
 	expect(bottom(@programs)).to eq(string)
+end
+
+Then("the total weight for {string} is {int}") do |string, int|
+	expect(weight(@programs, string)).to eq(int)
+	puts "WEIGHTED:: #{@programs}"
 end

@@ -19,6 +19,19 @@ Feature:
 		Given a program list file of "1707.sample.in"
 		Then the program at the bottom is "tknk"
 
+	Scenario Outline:
+		Given a program list file of "1707.sample.in"
+		Then the total weight for "<program>" is <weight>
+
+		Examples:
+			| program | weight |
+			| gyxo    | 61     |
+			| ebii    | 61     |
+			| jptl    | 61     |
+			| ugml    | 251    |
+			| padx    | 243    |
+			| fwft    | 243    |
+
 	Scenario:
 		Given a program list file of "1707.in"
 		Then the program at the bottom is "vgzejbd"
