@@ -50,4 +50,20 @@ Feature:
 		Given the file "1709.in"
 		Then the score is 12396
 
+	Scenario Outline:
+		Given the stream "<stream>"
+		Then there are <n> trash characters
 
+		Examples:
+			| stream 		| n  |
+			| <> 			| 0  |
+			| <random characters>	| 17 |
+			| <<<<> 		| 3  |
+			| <{!>}> 		| 2  |
+			| <!!> 			| 0  |
+			| <!!!>> 		| 0  |
+			| <{o\"i!a,<{i<a> 	| 10 |
+
+	Scenario:
+		Given the file "1709.in"
+		Then there are 6346 trash characters

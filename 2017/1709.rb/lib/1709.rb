@@ -1,12 +1,14 @@
 def trash(str)
 	clone = str.dup
 
-	while clone.gsub!(/!./,"XX")
+	while clone.gsub!(/!./,"")
 		# do gsub
 	end
 
-	while clone.gsub!(/(<.*?>)/, "_")
-		# do gsub
+	while clone.gsub!(/(<)(.*?)(>)/) {
+		matched = Regexp.last_match[2]
+		matched.gsub!(/./, 'W')
+	}
 	end
 
 	return clone
@@ -14,7 +16,7 @@ end
 
 def all_garbage(str)
 	clean = trash(str)
-	clean.match(/_+?/)[0].length == clean.length
+	clean.gsub("W","") == ""
 end
 
 def count_groups(str)
@@ -24,7 +26,7 @@ end
 
 def score(str)
 	current = 0
-	m = trash(str).chars.map{|c|
+	trash(str).chars.map{|c|
 		case c
 		when "{"
 			current += 1
@@ -34,8 +36,11 @@ def score(str)
 		else
 			0
 		end
-	}
-	m.reduce(:+)
+	}.reduce(:+)
+end
+
+def trash_count(str)
+	trash(str).chars.map{|c| if c=="W" then 1 else 0 end}.reduce(:+) || 0
 end
 
 def file(str)

@@ -5,7 +5,6 @@ Given("the stream {string}") do |string|
 end
 
 Then("it should all be garbage") do
-	#puts "STR:: #{@str} TRASHED:: #{trash(@str)}"
 	expect(all_garbage(@str)).to eq(true)
 end
 
@@ -20,3 +19,8 @@ end
 Given("the file {string}") do |string|
 	@str = file(string)	
 end
+
+Then("there are {int} trash characters") do |int|
+	expect(trash_count(@str)).to eq(int)
+end
+
