@@ -18,6 +18,7 @@ Feature:
 	Scenario:
 		Given a program list file of "1707.sample.in"
 		Then the program at the bottom is "tknk"
+		And the correct weight to balance is 60
 
 	Scenario Outline:
 		Given a program list file of "1707.sample.in"
@@ -35,8 +36,4 @@ Feature:
 	Scenario:
 		Given a program list file of "1707.in"
 		Then the program at the bottom is "vgzejbd"
-
-
-
-
-	
+		And the correct weight to balance is 1226

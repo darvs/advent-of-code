@@ -5,7 +5,7 @@ Given("a program describes itself as {string}") do |string|
 end
 
 Then("its name is {string}") do |string|
- 	expect(@line[:name]).to eq(string)
+	expect(@line[:name]).to eq(string)
 end
 
 Then("its weight is {int}") do |int|
@@ -22,11 +22,13 @@ end
 
 Then("the program at the bottom is {string}") do |string|
 	weight(@programs, bottom(@programs))
-	unbalanced(@programs)
 	expect(bottom(@programs)).to eq(string)
 end
 
 Then("the total weight for {string} is {int}") do |string, int|
 	expect(weight(@programs, string)).to eq(int)
-	puts "WEIGHTED:: #{@programs}"
+end
+
+Then("the correct weight to balance is {int}") do |int|
+	expect(unbalanced(@programs, bottom(@programs))).to eq(int)
 end
