@@ -9,5 +9,5 @@ Then('{int} squares are used in the grid') do |int|
 end
 
 Then('there are {int} regions present') do |int|
-  expect(regions(@hashes)).to eq(int)  
+  expect(regions(@hashes)).to eq(int)
 end

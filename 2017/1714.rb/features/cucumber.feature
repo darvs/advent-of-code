@@ -11,4 +11,5 @@ Feature:
 	Scenario:
 		Given a key of "oundnydw"
 		Then 8106 squares are used in the grid
+		And there are 1164 regions present
 
