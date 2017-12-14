@@ -19,49 +19,30 @@ def used(hashes)
 end
 
 def are_neighbours(a, b)
-  ((b[0] == a[0]) && ((b[1] - a[1]).abs == 1)) || ((b[1] == a[1]) && ((b[0] - a[0]).abs == 1))
-end
-
-def are_neighbours2(a, b)
   [[0, 1], [1, 0]].include?([a, b].transpose.map{|p, q| (p - q)})
 end
 
 def touches_set(set, p)
-  set.each{|p0| return true if are_neighbours2(p, p0)}
+  set.each{|p0| return true if are_neighbours(p, p0)}
   false
 end
 
-class Set
-  def to_s
-    to_a.join(',')
-  end
-end
-
 def add_to_sets(sets, p)
-  touching = []
-  sets.each{|s| touching += [s] if touches_set(s, p)}
+  merged = Set.new([p])
 
-  if touching.empty?
-    sets << Set.new([p])
-  else
-    merged = Set.new
-    touching.each{|s|
-      merged = merged.merge(s)
-      sets.delete(s)
-    }
-    merged = merged << p
-    sets << merged
-  end
+  sets.select{|s| touches_set(s, p)}.each{|s|
+    merged = merged.merge(s)
+    sets.delete(s)
+  }
+
+  sets << merged
 end
 
 def regions(hashes)
   sets = Set.new
-  ones = hashes.each.with_index.flat_map{|h, y| h.chars.each.with_index.select{|c, _| c == '1'}.map{|_, x| [x, y]}}
-  ones.each{|p| sets = add_to_sets(sets, p)}
 
-  # puts "ONES:: #{ones}"
-
-  # puts "SETS:: #{sets}"
+  hashes.each.with_index.flat_map{|h, y| h.chars.each.with_index.select{|c, _| c == '1'}.map{|_, x| [x, y]}}
+        .each{|p| sets = add_to_sets(sets, p)}
 
   sets.length
 end
