@@ -9,8 +9,8 @@ label_c_n=Hash.new {|h,k| h[k] = Hash.new(0)}
 #   that {|h,k|...} expression creates a new set for the labels
 n_label=Hash.new {|h,k| h[k] = Set.new}
 
-# for each label, count of occurrences of each character
-File.readlines('input').map(&:strip).map{|label| label.each_char{|c| label_c_n[label][c] += 1};}
+# for each label, count the occurrences of each character
+File.readlines('input').map(&:strip).each{|label| label.each_char{|c| label_c_n[label][c] += 1};}
 
 # gather the sets of labels for each number of occurrences of a character
 label_c_n.each{|label,c_n| c_n.each{|_,n| n_label[n].add(label)}}
