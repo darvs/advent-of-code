@@ -1,7 +1,19 @@
 #!/usr/bin/env ruby
 require 'set'
-h=Hash.new(0)
-has=Hash.new(nil)
-File.readlines('input').map(&:strip).each{|s| s.each_char.each{|c| h[s+"."+c] += 1}}
-h.select{|_,x| [2,3].include? x}.each{|z,v| has[v].nil? ? has[v]=Set[z.split('.')[0]] : has[v].add(z.split('.')[0])}
-puts "#{has[2].count}*#{has[3].count}=\n#{has[2].count*has[3].count}"
+
+# label_c_n[label][character] = number of occurrence of character in label
+#   that {|h,k|...} expression creates a new hash inside each new item
+label_c_n=Hash.new {|h,k| h[k] = Hash.new(0)}
+
+# n_label[number] = set of labels which have n occurences of any character
+#   that {|h,k|...} expression creates a new set for the labels
+n_label=Hash.new {|h,k| h[k] = Set.new}
+
+# for each label, count of occurrences of each character
+File.readlines('input').map(&:strip).map{|label| label.each_char{|c| label_c_n[label][c] += 1};}
+
+# gather the sets of labels for each number of occurrences of a character
+label_c_n.each{|label,c_n| c_n.each{|_,n| n_label[n].add(label)}}
+
+# print it all out
+puts "#{n_label[2].count}*#{n_label[3].count}=\n#{n_label[2].count*n_label[3].count}"
