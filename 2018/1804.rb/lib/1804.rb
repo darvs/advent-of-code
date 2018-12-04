@@ -7,16 +7,16 @@ def parse(line, schedule, context)
   when /Guard #(\d+) begins shift/
     context[:guard] = $~[1].to_i
     context[:fell_asleep_at] = -1
-    puts "guard #{context[:guard]}"
+    #puts "guard #{context[:guard]}"
 
   when /falls asleep/
     context[:fell_asleep_at] = minute
-    puts "falls asleep at #{minute}"
+    #puts "falls asleep at #{minute}"
 
   when /wakes up/
     # The guard was asleep in all the minutes between the last time he fell asleep and the minute before the current minute
 
-    puts "wakes up at #{minute}"
+    #puts "wakes up at #{minute}"
 
     for m in context[:fell_asleep_at] .. ((minute - 1) % 60)
       #puts "schedule #{schedule}"
@@ -41,7 +41,7 @@ def exec_file(filename)
   File.open(File.join('data', filename)).map(&:strip).select{|line| !line.empty?}
     .sort.each{|line| parse(line, schedule, context)}
 
-  puts "schedule #{schedule}"
+  #puts "schedule #{schedule}"
 
   minutes_asleep = Hash.new(0)
   guard_minute_asleep_times = Hash.new{|h,k| h[k] = Hash.new}
@@ -50,10 +50,10 @@ def exec_file(filename)
     minute.each{|guard,times_asleep|
       minutes_asleep[guard] += times_asleep
 
-      puts "guard #{guard} index #{index} times_asleep #{times_asleep}"
+      #puts "guard #{guard} index #{index} times_asleep #{times_asleep}"
 
       guard_minute_asleep_times[guard][index] = times_asleep
-      puts "tmp g_m_a_t #{guard_minute_asleep_times}"
+      #puts "tmp g_m_a_t #{guard_minute_asleep_times}"
       
     }
   }
@@ -61,9 +61,15 @@ def exec_file(filename)
 
   puts "g_m_a_t #{guard_minute_asleep_times}"
 
-  guard_asleep_most_at = guard_minute_asleep_times[guard_most_minutes_asleep].max_by{|k,v| v}.first
+  guard_most_minutes_asleep_most_asleep_at = guard_minute_asleep_times[guard_most_minutes_asleep].max_by{|k,v| v}.first
 
-  puts "minutes #{minutes_asleep}"
+  #puts "minutes #{minutes_asleep}"
 
-  return guard_most_minutes_asleep, guard_asleep_most_at
+  print "---->"
+  guard_most_frequently_asleep_on_same_minute = ([:guard, :minute].zip(guard_minute_asleep_times.map{|guard, minute_asleep_times| [minute_asleep_times.max_by{|minute, asleep_times| asleep_times}.last,[guard, minute_asleep_times.max_by{|minute, asleep_times| asleep_times}.first]]}.max_by{|asleep_times, guard_minute| asleep_times}.last)).to_h
+
+  print guard_most_frequently_asleep_on_same_minute
+  print "<----"
+
+  return guard_most_minutes_asleep, guard_most_minutes_asleep_most_asleep_at, guard_most_frequently_asleep_on_same_minute
 end
