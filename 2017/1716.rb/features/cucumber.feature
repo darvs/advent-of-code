@@ -17,7 +17,4 @@ Feature: Watch the programs dance
 		Given the programs "abcdefghijklmnop"
 		And the sequence of dance moves in "1716.in"
 		Then the ending positions should be "gkmndaholjbfcepi" after performing it 1 times
-		##And the ending positions should be "ceadb" after performing it 1000000000 times
-		##And the ending positions should be "ceadb" after performing it 1000 times
-		
-
+		And the ending positions should be "abihnfkojcmegldp" after performing it 1000000000 times

@@ -15,7 +15,7 @@ def partner(programs, a, b)
 end
 
 def dance(programs, move)
-  case move['cmd'] 
+  case move['cmd']
   when 's'
     spin(programs, move['p1'].to_i)
   when 'x'
@@ -25,12 +25,11 @@ def dance(programs, move)
   end
 end
 
-
 def parse(str)
   # Sample format :  #1 @ 1,3: 4x4
   regexp = Regexp.union(
     /(?<cmd>[a-z])(?<p1>\w+)(\/(?<p2>\w+))?/
-  ) 
+  )
 
   #print "STR #{str} "
   #print "SCAN #{str.scan(regexp)}\n"
@@ -40,22 +39,41 @@ def parse(str)
   }.first
 end
 
-def exec_file(filename, programs, times)
-  #puts "PROGRAMS:: #{programs}"
+def exec_file(filename, programs_str, times)
 
   moves = File.open(File.join('data', filename)).map(&:strip).select{|line| !line.empty?}
     .map{|l| l.lines(",")}
     .flatten
     .map{|l| l.chomp(',')}
-    .map {|str| parse(str)}
-  chars = programs.chars
-  (1..times).each {
-    moves.each{|move| dance(chars, move)}
-  }
+    .map{|str| parse(str)}
 
-  #puts "CHARS:: #{chars}"
- 
-  #puts "FINAL PROGRAMS!:: #{programs}"
+  programs = programs_str.chars
+  seen = [programs_str]
 
-  return chars.join
+  for _ in (1 .. times)
+    moves.each{|move| dance(programs, move)}
+
+    if seen.index(programs.join) != nil then
+      puts "There is a loop in the values and it's #{seen.length} moves long"
+
+      # After looping (times div seen.length),
+      # we'd still need to dance (times mod seen.length) moves
+      # to dance a total of "times" dance moves.
+
+      # For instance, if we had to dance 136 moves, with a loop length of 60,
+      # We would have gone through the loop twice (136 div 60 = 2), and then
+      # we would have danced the 16 first steps of the loop again (136 % 60 = 16)
+      # and so, after the 136th, we would have been in exactly the same position
+      # as after the 16th move.
+
+      final = seen[times % seen.length]
+      break
+    end
+
+    final = programs.join
+    puts "Pushing # #{seen.length} : #{final}"
+    seen.push(final)
+  end
+
+  return final
 end
