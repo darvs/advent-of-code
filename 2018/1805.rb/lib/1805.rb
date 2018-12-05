@@ -1,11 +1,14 @@
-def parse(line)
+def parse(line, skip=nil)
 
   head = []
   tail = line.chars
 
   while tail.length > 0 do
 
-    if head.length == 0 then
+    if !skip.nil? && skip.casecmp?(tail[0]) then
+      tail.shift
+
+    elsif head.length == 0 then
       head = [tail.shift]
 
     elsif head[-1].swapcase == tail[0] then
@@ -14,6 +17,7 @@ def parse(line)
 
     else
       head.concat([tail.shift])
+
     end
 
   end
@@ -23,9 +27,17 @@ end
 
 def exec_file(filename)
 
-  stable = File.open(File.join('data', filename)).map(&:strip).select{|line| !line.empty?}
-    .map{|line| parse(line)}.first
+  polymer = File.open(File.join('data', filename)).map(&:strip).select{|line| !line.empty?}.first
 
-  return stable
+  stable = parse(polymer)
+
+  filtering = [:unit, :len, :result].zip(('a'..'z').map{|c|
+    result = parse(polymer, c)
+    [c, result.length, result]
+  }.min_by{|_, len, _| len}).to_h
+
+  #puts "filtering #{filtering}"
+
+  return stable, filtering
 
 end
