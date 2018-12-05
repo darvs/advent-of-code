@@ -5,9 +5,10 @@ Feature: Reduce polymers
 
 	Scenario: Figure out how many units remain after all the destruction in sample file
 		Given the polymer in "1805.sample.in"
-		Then the remaining polymer would be "dabCBAcaDA"
+		Then the remaining polymer would be 10 characters long
+		And it would be "dabCBAcaDA"
 
-	Scenario: Figure out how many units remain after all the destruction
-		Given the polymer in "1805.in"
-		Then the remaining polymer would be "dabCBAcaDA"
+	#Scenario: Figure out how many units remain after all the destruction
+		#Given the polymer in "1805.in"
+		#Then the remaining polymer would be 9154 characters long
 

@@ -1,52 +1,24 @@
-def parse(polymer)
+def parse(line)
 
-  reduced = polymer.clone
+  head = []
+  tail = line.chars
 
-  puts "reduced #{reduced}"
-  STDOUT.flush
+  while tail.length > 0 do
 
-  while 1 do
-    start = reduced.clone
+    if head.length == 0 then
+      head = [tail.shift]
 
-    continue = true
-    offset = 0
-    puts "scan #{reduced} l-1 #{reduced.length-1}"
-    STDOUT.flush
-    while (continue == true) and (offset < reduced.length-1) do
-      puts "meanwhile #{offset}"
-      if reduced[offset+1] == reduced[offset].swapcase then
-        puts "score #{reduced[offset]} #{reduced[offset+1]}"
-        reduced.slice!(offset, 2)
-        puts "reduced #{reduced}"
-        continue = false
-        break;
-        offset = 255
-      end
-      #break if reduced == polymer
-      offset = offset + 1
-      STDOUT.flush
-      #if offset > 5 then continue = false end
+    elsif head[-1].swapcase == tail[0] then
+      head.pop
+      tail.shift
+
+    else
+      head.concat([tail.shift])
     end
 
-    puts "cmp @#{offset} #{reduced} #{polymer}"
-    STDOUT.flush
-    break if reduced == start
   end
 
-  #reduced.scan(/([A-Za-z])([A-Za-z])/).each{|pair| 
-    #puts "pair #{pair[0]} , #{pair[1]}"
-    #if pair[1] == pair[0].swapcase then 
-      #puts "score #{pair[0]} , #{pair[1]}"
-      #reduced.gsub!(pair[0],pair[1]) 
-    #end}
-
-  return reduced
-
-  #if (reduced == polymer) then
-    #return polymer
-  #else
-    #return parse(reduced)
-  #end
+  return head.join
 end
 
 def exec_file(filename)
