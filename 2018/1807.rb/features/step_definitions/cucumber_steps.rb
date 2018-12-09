@@ -3,7 +3,6 @@
 require_relative "../../lib/1807.rb"
 
 Before do
-  puts "!! Before !!"
   @order = ""
   @time = 0
 end
@@ -35,5 +34,3 @@ Then("it should be finished in {int} seconds") do |int|
   end
   expect(@time).to eq(int)
 end
-
-
