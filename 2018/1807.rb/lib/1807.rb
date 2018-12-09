@@ -23,24 +23,23 @@ def exec(rules, n_workers = 2, base = 0)
                  .sort
 
     # delete jobs whose payloads have just been delivered
-    jobs.delete_if{|h, _| h[:ends] == time}
+    jobs.delete_if{|j| j[:ends] == time}
 
     # examine candidates, create as many new jobs as possible
-    rules.select{|r| rules[r].to_a.all?{|prec| order.include?(prec)}}
-         .sort
-         .each{|c, _|
-           if jobs.size < n_workers
-             jobs += [{ ends: time + base + c.ord - 'A'.ord + 1, payload: c }]
-             rules.delete(c)
-           end
-         }
+    jobs += rules.select{|r| rules[r].to_a.all?{|prec| order.include?(prec)}}
+                 .sort
+                 .take(n_workers - jobs.size)
+                 .map{|c, _|
+                   rules.delete(c)
+                   { ends: time + base + c.ord - 'A'.ord + 1, payload: c }
+                 }
   end
 
   [order.join, time]
 end
 
 def exec_file(filename, n_workers, time_completion_base)
-  rules = Hash.new{|k, v| k[v] = Set.new}
+  rules = Hash.new{|h, k| h[k] = Set.new}
 
   File.open(File.join('data', filename))
       .map(&:strip)
