@@ -3,11 +3,7 @@
 def calc_fuel_recursive(mass, recursive)
   f = [0, (mass / 3) - 2].max
 
-  if recursive && f.positive?
-    f + calc_fuel_recursive(f, recursive)
-  else
-    f
-  end
+  recursive && f.positive? ? f + calc_fuel_recursive(f, recursive) : f
 end
 
 def total_fuel(filename, recursive)

@@ -36,4 +36,4 @@ Feature: The Tyranny of the Rocket Equation
 	
 	Scenario: Find the total fuel needed for all modules with fuel
 		Given the list of masses in file '1901.in'
-		Then the total amount of fuel required with the recursive method would be 3481005
+		Then the total amount of fuel required with the recursive method would be 5218616
