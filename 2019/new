@@ -31,6 +31,6 @@ STEPS="${PROJ}"/features/step_definitions/cucumber_steps.rb
 [[ -f "${STEPS}" ]] || echo "require_relative \"../../lib/"${ARG}"\"" > "${STEPS}"
 
 from_template "Makefile" "Makefile"
+from_template "lib/${ARG}" template.rb
 
-touch "${PROJ}"/lib/"${ARG}"
 touch "${PROJ}"/data/"${NOEXT}".in
