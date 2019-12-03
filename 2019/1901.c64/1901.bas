@@ -1,5 +1,5 @@
 12 print "the tyranny of the rocket equation"
-20 open 1,8,2,"0:simple.seq,s,r"
+20 open 1,8,2,"0:1901.seq,s,r"
 21 t = 0: t2 = 0
 25 for l = 0 to 1
 30   input#1,m

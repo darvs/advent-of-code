@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+make
+x64 -warp +confirmonexit obj/image.d64
+
