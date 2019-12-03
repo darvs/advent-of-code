@@ -28,7 +28,8 @@ cd "${BASE}"
 from_template "features/cucumber.feature" "cucumber.feature"
 
 STEPS="${PROJ}"/features/step_definitions/cucumber_steps.rb
-[[ -f "${STEPS}" ]] || echo "require_relative \"../../lib/"${ARG}"\"" > "${STEPS}"
+
+[[ -f "${STEPS}" ]] || echo "# frozen_string_literal: true\n\nrequire_relative '../../lib/"${ARG}"'" > "${STEPS}"
 
 from_template "Makefile" "Makefile"
 from_template "lib/${ARG}" template.rb
