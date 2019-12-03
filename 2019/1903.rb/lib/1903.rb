@@ -1,38 +1,37 @@
 # frozen_string_literal: true
 
-require 'ruby-prolog'
 
 # A wire definition class
 class WireChecker
 
-  def gt(a, b)
-    a > b
-  end
+  D=1
+  X0=2
+  Y0=3
+  X1=4
+  Y1=5
 
   def initialize(filename)
-    @prolog = RubyProlog::Core.new
     @x = File.open(File.join('data', filename)).map.with_index{|line, number| [number, line.strip.split(',')]}
-    #p @x
-    @x.each{|line| parse(line)}
+    @list = @x.map{|line| parse(line)}
+  end
 
-    @prolog.instance_eval do
-      p query(lines[:L, :X0, :Y0, :X, :Y])
-
-      cross[:AX0, :AY0] << [
-        lines[:A, :AX0, :AY0, :AX1, :AY1],
-        lines[:B, :BX0, :BY0, :BX1, :BY1],
-        noteq[:A, :B],
-        eq[:AX0, :AX1]
-      ]
-
-      p query(cross[:X, :Y])
-    end
+  def process
+    @list[0].product(@list[1])
+            .select{|z| z[0][D] != z[1][D]}
+            .map{|x| cross(x[0], x[1])}
+            .compact
+            .map{|y| y[0].abs + y[1].abs}
+            .select{|z| z != 0}
+            .sort[0]
   end
 
   def parse(line)
     linenum = line[0]
-    #puts "line ##{linenum}"
     parse_moves(linenum, 0, 0, [], line[1])
+  end
+
+  def orientation(direction)
+    case direction when 'U', 'D' then 'V' else 'H' end
   end
 
   def parse_moves(line, x0, y0, list, moves)
@@ -47,20 +46,42 @@ class WireChecker
     y = y0
 
     case direction
-    when 'U'
-      y += len
-    when 'D'
-      y -= len
-    when 'R'
-      x += len
-    when 'L'
-      x += len
+    when 'U' then y += len
+    when 'D' then y -= len
+    when 'R' then x += len
+    when 'L' then x -= len
     end
 
-    @prolog.instance_eval do
-      lines[line, x0, y0, x, y].fact
+    case direction
+    when 'U', 'R' then ordered = [line, orientation(direction), x0, y0, x, y]
+    else ordered = [line, orientation(direction), x, y, x0, y0]
     end
 
-    parse_moves(line, x, y, list << move, moves[1..-1])
+    parse_moves(line, x, y, list << ordered, moves[1..-1])
+  end
+
+  def vertical(line)
+    line[X0] == line[X1]
+  end
+
+  def horizontal(line)
+    not vertical(line)
+  end
+
+  def vxh(lhs, rhs)
+    #puts "lhs #{lhs} rhs #{rhs}"
+    if vertical(lhs) && horizontal(rhs) && lhs[X0] >= rhs[X0] && lhs[X0] <= rhs[X1] && rhs[Y0] >= lhs[Y0] && rhs[Y0] <= lhs[Y1]
+      #puts "yes [#{lhs[X0]}, #{rhs[Y0]}]"
+ 
+      return [lhs[X0], rhs[Y0]]
+    end
+    #puts "nope"
+  end
+
+  def cross(lhs, rhs)
+    v = vxh(lhs, rhs)
+    return v if !v.nil?
+
+    vxh(rhs, lhs)
   end
 end

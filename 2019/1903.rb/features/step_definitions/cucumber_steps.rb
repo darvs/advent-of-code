@@ -7,5 +7,5 @@ Given('the wires in {string}') do |string|
 end
 
 Then('the closest intersection should be at distance {int}') do |int|
-  pending # Write code here that turns the phrase above into concrete actions
+  expect(@wires.process).to eq(int)
 end
