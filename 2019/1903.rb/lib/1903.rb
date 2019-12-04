@@ -4,37 +4,31 @@
 # A wire definition class
 class WireChecker
 
-  D=1
-  X0=2
-  Y0=3
-  X1=4
-  Y1=5
-
   def initialize(filename)
     @x = File.open(File.join('data', filename)).map.with_index{|line, number| [number, line.strip.split(',')]}
     @list = @x.map{|line| parse(line)}
   end
 
   def process
+    #p @list
     @list[0].product(@list[1])
-            .select{|z| z[0][D] != z[1][D]}
             .map{|x| cross(x[0], x[1])}
             .compact
             .map{|y| y[0].abs + y[1].abs}
-            .select{|z| z != 0}
-            .sort[0]
+            .reject(&:zero?)
+            .min
   end
 
   def parse(line)
     linenum = line[0]
-    parse_moves(linenum, 0, 0, [], line[1])
+    parse_moves(linenum, line[1])
   end
 
   def orientation(direction)
-    case direction when 'U', 'D' then 'V' else 'H' end
+    case direction when 'U', 'D' then :vertical else :horizontal end
   end
 
-  def parse_moves(line, x0, y0, list, moves)
+  def parse_moves(line, moves, x0 = 0, y0 = 0, list = [])
     return list if moves.empty?
 
     move = moves.first
@@ -52,36 +46,24 @@ class WireChecker
     when 'L' then x -= len
     end
 
-    case direction
-    when 'U', 'R' then ordered = [line, orientation(direction), x0, y0, x, y]
-    else ordered = [line, orientation(direction), x, y, x0, y0]
-    end
+    current = { lineno: line, orientation: orientation(direction), x0: x0, y0: y0, x1: x, y1: y }
 
-    parse_moves(line, x, y, list << ordered, moves[1..-1])
+    parse_moves(line, moves[1..-1], x, y, list << current)
   end
 
-  def vertical(line)
-    line[X0] == line[X1]
-  end
+  def between(x, a, b)
+    return between(x, b, a) if a > b
 
-  def horizontal(line)
-    not vertical(line)
-  end
-
-  def vxh(lhs, rhs)
-    #puts "lhs #{lhs} rhs #{rhs}"
-    if vertical(lhs) && horizontal(rhs) && lhs[X0] >= rhs[X0] && lhs[X0] <= rhs[X1] && rhs[Y0] >= lhs[Y0] && rhs[Y0] <= lhs[Y1]
-      #puts "yes [#{lhs[X0]}, #{rhs[Y0]}]"
- 
-      return [lhs[X0], rhs[Y0]]
-    end
-    #puts "nope"
+    (a..b).include?(x)
   end
 
   def cross(lhs, rhs)
-    v = vxh(lhs, rhs)
-    return v if !v.nil?
+    return nil if lhs[:orientation] == rhs[:orientation]
+    return cross(rhs, lhs) if lhs[:orientation] != :vertical
 
-    vxh(rhs, lhs)
+    if between(lhs[:x0], rhs[:x0], rhs[:x1]) &&
+       between(rhs[:y0], lhs[:y0], lhs[:y1])
+      [lhs[:x0], rhs[:y0]]
+    end
   end
 end
