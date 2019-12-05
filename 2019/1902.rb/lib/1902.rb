@@ -21,7 +21,7 @@ class IntcodeInterpreter
     new(read_file(filename))
   end
 
-  def set_error_val(val)
+  def error=(val)
     set_error(val / 100, val % 100)
   end
 
@@ -62,15 +62,14 @@ class IntcodeInterpreter
   end
 
   def run
-    ins = read
-    while ins != BRK
-      case ins
-      when ADD
-        add
-      when MUL
-        mul
-      end
+    loop do
       ins = read
+      break if ins == BRK
+
+      case ins
+      when ADD then add
+      when MUL then mul
+      end
     end
     #puts "PC: #{@pc}, CODE: #{@code}"
     self

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/1902.rb'
-
 Given('a program of {string}') do |string|
   @pgm = IntcodeInterpreter.new(string)
 end
@@ -12,7 +10,7 @@ Given('the program in file {string}') do |string|
 end
 
 Then('if the error is set to {int}') do |int|
-  @pgm.set_error_val(int)
+  @pgm.error = int
 end
 
 Then('the result should be {string}') do |string|
