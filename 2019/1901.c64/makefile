@@ -16,10 +16,10 @@ $(shell $(MKDIR_P) $(OBJ_DIR))
 .PHONY: all delete-image build-image write-prg write-seq clean
 
 $(OBJ_DIR)/%.prg: %.bas
-	$(PETCAT) -w2 -o $@ -- $<
+	$(PETCAT) -v -w2 -o $@ -- $<
 
 $(OBJ_DIR)/%.seq: %.in
-	$(PETCAT) -text -w2 -o $@ -- $<
+	$(PETCAT) -text -v -w2 -o $@ -- $<
 	
 $(OBJ_DIR)/%.d64: $(PRGS) $(SEQS)
 	$(C1541) -format $(notdir $(patsubst %.d64,%,$@)),dd d64 $@ 
