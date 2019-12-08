@@ -43,7 +43,7 @@ class IntcodeInterpreter
     self
   end
 
-  def with_add_input(val)
+  def add_input(val)
     @input << val.to_i
     self
   end

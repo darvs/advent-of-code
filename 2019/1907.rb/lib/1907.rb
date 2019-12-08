@@ -24,7 +24,7 @@ class MultiCPUIntcodeInterpreter
   end
 
   def input=(val)
-    @input = val.split(',').map(&:to_i).to_a
+    with_input(val)
   end
 
   def output
@@ -48,25 +48,16 @@ class MultiCPUIntcodeInterpreter
   def self.feedback_loop(program, seq_string)
     cpu = Array.new(5) {IntcodeInterpreter.new(program)}
     seq_string.split(',').each.with_index{|v, i|
-      #p [:cpu, i, :input, v]
-      cpu[i].with_add_input(v)
+      cpu[i].add_input(v)
     }
-    #cpu[0].with_add_input(0)
-    #seq = seq_string.split(',')
 
-    current = 0
     out = [0]
     loop do
-      out.each{|n| cpu[current].with_add_input(n.to_s)}
-      #p [:current, current, :state, cpu[current].state, :input, cpu[current].input]
-      out = cpu[current].run.output.split(',').map(&:to_i)
-      #p [:out, out, :state, cpu[current].state, :input, cpu[current].input]
-      list = (0..4).map{|n| cpu[n].state}.select{|state| state == :terminated}
-      #p [:list, list, list.length]
-
-      break if list.length == 5
-
-      current = (current + 1) % 5
+      cpu.each{|c|
+        out.each{|n| c.add_input(n)}
+        out = c.run.output.split(',').map(&:to_i)
+      }
+      break if cpu.map(&:state).select{|s| s == :terminated}.count.eql?(5)
     end
     out.first
   end
@@ -76,6 +67,4 @@ class MultiCPUIntcodeInterpreter
       feedback_loop(program, settings.join(',')).to_i
     }.max
   end
-
-  
 end
