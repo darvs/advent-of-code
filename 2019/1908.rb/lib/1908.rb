@@ -5,9 +5,8 @@ class Image
   def initialize(arr, width, height)
     @width = width
     @height = height
-    @layers = arr.each_slice(width * height).inject([]){|layers, x|
-      layers += [x]
-      layers
+    @layers = arr.each_slice(width * height).reduce([]){|layers, x|
+      layers + [x]
     }
   end
 
@@ -21,7 +20,6 @@ class Image
     @layers.map{|l|
       l.each_with_object(Hash.new(0)){|color, hash|
         hash[color] += 1
-        hash
       }
     }
            .min_by{|l| l[first]}
@@ -33,17 +31,14 @@ class Image
   def show
     @layers.transpose.map{|px|
       px.reduce('.'){|color, pixel|
-        if color == '.'
-          case pixel
-          when 1 then color = '#'
-          when 0 then color = ' '
-          end
+        case pixel
+        when 1 then break '#'
+        when 0 then break ' '
+        else color
         end
-        color
       }
-    }.each_slice(@width).inject([]){|line, px|
-      line += [px]
-      line
+    }.each_slice(@width).reduce([]){|line, px|
+      line + [px]
     }.map(&:join).each{|l| puts(l)}
   end
 end
