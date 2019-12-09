@@ -59,7 +59,6 @@ class IntcodeInterpreter
   end
 
   def output
-    p [:output, @output]
     resp = @output.join(',')
     @output = []
     resp
@@ -93,25 +92,18 @@ class IntcodeInterpreter
     mode = @modes % 10
     @modes /= 10
 
-    p [:fetch, :val, val, :mode, mode]
-
     case mode
-    when MODE_POSITION then ret = peek(val)
-    when MODE_RELATIVE then ret = peek_rel(val)
-    else ret = val
+    when MODE_POSITION then peek(val)
+    when MODE_RELATIVE then peek_rel(val)
+    else val
     end
-
-    p [:ret, ret]
-    ret
   end
 
   def peek(pos)
-    p [:peek, pos]
     @code[pos]
   end
 
   def peek_rel(pos)
-    p [:peek_rel, pos, @rel_base]
     peek(pos + @rel_base)
   end
 
@@ -128,18 +120,14 @@ class IntcodeInterpreter
   end
 
   def add
-    p debug
     a = fetch(read)
     b = fetch(read)
-    p [:a, a, :b, b]
     poke(read, a + b)
   end
 
   def mul
-    #p ['code', @code]
     a = fetch(read)
     b = fetch(read)
-    #p [:a, a, :b, b]
     poke(read, a * b)
   end
 
@@ -151,16 +139,11 @@ class IntcodeInterpreter
     @state = :running
 
     a = @input.shift
-    p [:inp, @input, :a, a, :state, @state]
-    #p ['read input', a, 'remaining', @input]
     poke(read, a)
   end
 
   def out
     a = fetch(read)
-    p debug
-    p [:out, a, '@pc', @pc]
-    #puts "out: #{a}"
     @output << a
   end
 
@@ -185,7 +168,6 @@ class IntcodeInterpreter
   def eq
     a = fetch(read)
     b = fetch(read)
-    #p ["eq a:#{a} b:#{b}"]
     poke(read, a == b ? 1 : 0)
   end
 
@@ -206,7 +188,6 @@ class IntcodeInterpreter
         @ins = word % 100
         @modes = word / 100
       end
-      #p ['run', debug]
 
       case @ins
       when ADD then add
@@ -223,7 +204,6 @@ class IntcodeInterpreter
 
       break if @state == :wait_for_input
     end
-    #puts "PC: #{@pc}, CODE: #{@code}"
     self
   end
 
@@ -231,7 +211,6 @@ class IntcodeInterpreter
     data = read_file(filename)
     (0..99).each do |noun|
       (0..99).each do |verb|
-        #puts "noun #{noun} verb #{verb}"
         if new(data).set_error(noun, verb).run.peek(pos) == val
           return (noun * 100 + verb)
         end
