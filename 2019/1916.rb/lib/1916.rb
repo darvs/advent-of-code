@@ -2,8 +2,10 @@
 
 # A Class to compute Flawed Frequency Transmission
 class FFT
-  def initialize(signal)
-    @signal = signal.chars.map(&:to_i)
+  def initialize(signal, times = 1)
+    @signal = (signal * times).chars.map(&:to_i)
+
+    @check_offset = @signal[0..6].map(&:to_s).reduce(:+).to_i
   end
 
   def self.from_file(filename)
@@ -18,22 +20,20 @@ class FFT
         # + part
         index = output_index
         while index < @signal.length do
-          (0..output_index).each {|x|
-            if index + x < @signal.length
-              #p [output_index, :+, :index, index + x, :val, @signal[index + x]]
-              out += @signal[index + x]
-            end
+          (index..index + output_index).each {|x|
+            break if x >= @signal.length
+
+            out += @signal[x]
           }
           index += (4 * (output_index + 1))
         end
 
         index2 = output_index + (2 * (output_index+1))
         while index2 < @signal.length do
-          (0..output_index).each {|x|
-            if index2 + x < @signal.length
-              #p [output_index, :-, :index2, index2 + x, :val, @signal[index2 + x]]
-              out -= @signal[index2 + x]
-            end
+          (index2..index2 + output_index).each {|x|
+            break if x >= @signal.length
+
+            out -= @signal[x]
           }
           index2 += (4 * (output_index + 1))
         end
@@ -43,11 +43,11 @@ class FFT
     end
   end
 
-  def pattern_digit_multiplier(input_pos, output_pos)
-    [0, 1, 0, -1][((input_pos + 1) / (output_pos + 1)) % 4]
+  def digits(n, offset = 0)
+    @signal[offset..offset + n - 1].map(&:to_s).reduce(&:+)
   end
 
-  def digits(n)
-    @signal[0..n - 1].map(&:to_s).reduce(&:+)
+  def digits_with_offset(n)
+    digits(n, @check_offset)
   end
 end

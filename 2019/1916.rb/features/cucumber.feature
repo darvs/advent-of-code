@@ -22,4 +22,15 @@ Feature: Flawed Frequency Transmission
 		When the signal is processed for 100 phases
 		Then the first 8 digits are "32002835"
 
+	#Scenario Outline:
+		#Given the input signal <signal> repeated 10000 times
+		#When the signal is processed for <phases> phases
+		#Then the 8 digits at the check offset are <digits>
+
+		#Examples:
+			#| signal                             | phases | digits     |
+			#| "03036732577212944063491565474664" | 100    | "84462026" |
+			#| "02935109699940807407585447034323" | 100    | "78725270" |
+			#| "03081770884921959731165446850517" | 100    | "53553731" |
+		
 

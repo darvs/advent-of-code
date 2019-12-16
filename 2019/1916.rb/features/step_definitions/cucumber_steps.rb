@@ -15,3 +15,11 @@ end
 Then('the first {int} digits are {string}') do |int, string|
   expect(@fft.digits(int)).to eq(string)
 end
+
+Given('the input signal {string} repeated {int} times') do |string, int|
+  @fft = FFT.new(string, int)
+end
+
+Then('the {int} digits at the check offset are {string}') do |int, string|
+  expect(@fft.digits_with_offset(int)).to eq(string)
+end
