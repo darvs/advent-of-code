@@ -13,17 +13,38 @@ class FFT
   def run(rounds)
     (1..rounds).each do
       @signal = (0..@signal.length - 1).map{|output_index|
-        @signal.each_with_index.map{|digit, input_index|
-          digit * pattern_digit_multiplier(input_index, output_index)
-        }.reduce(&:+).abs % 10
+        out = 0
+
+        # + part
+        index = output_index
+        while index < @signal.length do
+          (0..output_index).each {|x|
+            if index + x < @signal.length
+              #p [output_index, :+, :index, index + x, :val, @signal[index + x]]
+              out += @signal[index + x]
+            end
+          }
+          index += (4 * (output_index + 1))
+        end
+
+        index2 = output_index + (2 * (output_index+1))
+        while index2 < @signal.length do
+          (0..output_index).each {|x|
+            if index2 + x < @signal.length
+              #p [output_index, :-, :index2, index2 + x, :val, @signal[index2 + x]]
+              out -= @signal[index2 + x]
+            end
+          }
+          index2 += (4 * (output_index + 1))
+        end
+
+        out.abs % 10
       }
     end
   end
 
   def pattern_digit_multiplier(input_pos, output_pos)
-    base = [0, 1, 0, -1]
-    offset = ((input_pos + 1) / (output_pos + 1)) % base.length
-    base[offset]
+    [0, 1, 0, -1][((input_pos + 1) / (output_pos + 1)) % 4]
   end
 
   def digits(n)
