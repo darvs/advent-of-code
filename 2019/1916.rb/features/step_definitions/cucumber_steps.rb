@@ -9,11 +9,11 @@ Given('the input signal in {string}') do |string|
 end
 
 When('the signal is processed for {int} phases') do |int|
-  @fft.run(int)
+  @sol = @fft.run(int)
 end
 
 Then('the first {int} digits are {string}') do |int, string|
-  expect(@fft.digits(int)).to eq(string)
+  expect(@sol).to eq(string)
 end
 
 Given('the input signal {string} repeated {int} times') do |string, int|

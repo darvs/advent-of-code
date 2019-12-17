@@ -12,7 +12,7 @@ class FFT
     new(File.read(File.join('data', filename)).strip)
   end
 
-  def run(rounds)
+  def run(rounds, offset = 0)
     mod = Hash.new([])
 
     (0..@signal.length - 1).each{|output_index|
@@ -37,42 +37,18 @@ class FFT
         index2 += (4 * (output_index + 1))
       end
     }
-    #p [:mod, mod]
-
-    #mod.keys.each{|k|
-      #p [k,'==',mod[k].map{|_,v| v}]
-    #}
-
-    (1..rounds).each do
-      @new_signal = Array.new(@signal.length, 0)
-      mod.each{|output_index, l|
-        
-        @new_signal[output_index] = l.map{|sign,x|
-          val = @signal[x]
-          #mod[output_index].delete_if{|_, v| v[1]==x} if val == 0
-          if sign == :+ then val else -val end }.reduce(&:+).abs % 10
-      }
-
-      #mod.each{|k, v|
-        #v.each{|s, x|
-          #p [k,x,@new_signal[x]]
-        #}
-      #}
- 
-      #mod.each{|k, v|
-        #mod.delete(k) if v.all?{|_, val| val == 0}
-      #}
-
-      #mod.each{|k, v|
-        #mod[k] = v.select{|_,val| val != 0}
-      #}
 
     #p [:mod, mod]
 
-      @signal = @new_signal #.map{|x| x.abs % 10}
-      #p digits(8)
-    end
+    list = []
+    (0..7).each{|n|
+      list += [mod[offset+n]]
+    }
+    #p [:zelist, list]
 
+    x = apply(mod, rounds-1, list)
+    #p [:apply_returned, x]
+    x.map(&:to_s).reduce(&:+)
   end
 
   def digits(n, offset = 0)
@@ -81,5 +57,49 @@ class FFT
 
   def digits_with_offset(n)
     digits(n, @check_offset)
-end
+  end
+
+  def adjust_signs(globsign, list)
+    #p [:adjust_signs,globsign,list]
+    return list if globsign == :+
+
+    list.map{|sign, val|
+      [sign == :+ ? :- : :+, val]
+    }
+  end
+
+  def apply(mod, round, list)
+    #p [:apply, round, list]
+
+    if round == 0
+      #p [:zerolist, list]
+      ret = (list.map{|sublist|
+        #p [:sublist, sublist]
+        sublist.map{|sign, n|
+          #p [:sign, sign, :n, n]
+          sign == :+ ? @signal[n] : -@signal[n]
+        }.reduce(:+).abs % 10
+      })
+      #p [:returns, ret]
+      return ret
+    end
+
+
+
+    #apply(mod, round - 1, list.map{|digits|
+      #digits.map{|sign, n|
+        #adjust_signs(sign, mod[n])
+      #}.flatten(1)}
+    #)
+
+    #p [:applylist, list]
+    return list.map{|sublist|
+      sublist.map{|sign, n|
+        a = apply(mod, round - 1, [mod[n]]).first
+        #p [:applied,a]
+        sign == :+ ? a : -a
+      }.reduce(&:+).abs % 10
+    }
+
+  end
 end
