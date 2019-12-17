@@ -6,6 +6,8 @@ class FFT
     @signal = (signal * times).chars.map(&:to_i)
 
     @check_offset = @signal[0..6].map(&:to_s).reduce(:+).to_i
+
+    @memo = Hash.new
   end
 
   def self.from_file(filename)
@@ -38,16 +40,14 @@ class FFT
       end
     }
 
-    #p [:mod, mod]
-
     list = []
     (0..7).each{|n|
       list += [mod[offset+n]]
     }
-    #p [:zelist, list]
+    #p [:zelist, list.flatten.reject{|x| [:+, :-].include?(x)}.sort.uniq.length]
+    #dgdg
 
     x = apply(mod, rounds-1, list)
-    #p [:apply_returned, x]
     x.map(&:to_s).reduce(&:+)
   end
 
@@ -60,7 +60,6 @@ class FFT
   end
 
   def adjust_signs(globsign, list)
-    #p [:adjust_signs,globsign,list]
     return list if globsign == :+
 
     list.map{|sign, val|
@@ -68,35 +67,29 @@ class FFT
     }
   end
 
+  def apply_memo(mod, round, list)
+    #p [:apply_memo,round,list,@memo]
+    m = @memo[[round, list]]
+    if m.nil?
+      @memo[[round, list]] = apply(mod, round, list)
+    end
+    @memo[[round, list]]
+  end
+
   def apply(mod, round, list)
-    #p [:apply, round, list]
 
     if round == 0
-      #p [:zerolist, list]
       ret = (list.map{|sublist|
-        #p [:sublist, sublist]
         sublist.map{|sign, n|
-          #p [:sign, sign, :n, n]
           sign == :+ ? @signal[n] : -@signal[n]
         }.reduce(:+).abs % 10
       })
-      #p [:returns, ret]
       return ret
     end
 
-
-
-    #apply(mod, round - 1, list.map{|digits|
-      #digits.map{|sign, n|
-        #adjust_signs(sign, mod[n])
-      #}.flatten(1)}
-    #)
-
-    #p [:applylist, list]
     return list.map{|sublist|
       sublist.map{|sign, n|
-        a = apply(mod, round - 1, [mod[n]]).first
-        #p [:applied,a]
+        a = apply_memo(mod, round - 1, [mod[n]]).first
         sign == :+ ? a : -a
       }.reduce(&:+).abs % 10
     }
