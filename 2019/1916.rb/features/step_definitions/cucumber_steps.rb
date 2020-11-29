@@ -13,7 +13,7 @@ When('the signal is processed for {int} phases') do |int|
 end
 
 Then('the first {int} digits are {string}') do |int, string|
-  expect(@sol).to eq(string)
+  expect(@fft.digits(int)).to eq(string)
 end
 
 Given('the input signal {string} repeated {int} times') do |string, int|

@@ -6,21 +6,19 @@ class FFT
     @signal = (signal * times).chars.map(&:to_i)
 
     @check_offset = @signal[0..6].map(&:to_s).reduce(:+).to_i
-
-    @memo = Hash.new
+    @calc_hash = Hash.new
   end
 
   def self.from_file(filename)
     new(File.read(File.join('data', filename)).strip)
   end
 
-  def run(rounds, offset = 0)
+  def run(rounds)
     mod = Hash.new([])
 
     (0..@signal.length - 1).each{|output_index|
-
       index = output_index
-      while index < @signal.length do
+      while index < @signal.length
         (index..index + output_index).each {|x|
           break if x >= @signal.length
 
@@ -29,8 +27,8 @@ class FFT
         index += (4 * (output_index + 1))
       end
 
-      index2 = output_index + (2 * (output_index+1))
-      while index2 < @signal.length do
+      index2 = output_index + (2 * (output_index + 1))
+      while index2 < @signal.length
         (index2..index2 + output_index).each {|x|
           break if x >= @signal.length
 
@@ -40,59 +38,48 @@ class FFT
       end
     }
 
-    list = []
-    (0..7).each{|n|
-      list += [mod[offset+n]]
-    }
-    #p [:zelist, list.flatten.reject{|x| [:+, :-].include?(x)}.sort.uniq.length]
-    #dgdg
+    #mod.keys.each{|k| p [:mod, k, mod[k]]}
 
-    x = apply(mod, rounds-1, list)
-    x.map(&:to_s).reduce(&:+)
+    @new_signal = Hash.new(0)
+    (0..0).each{|x|
+      @new_signal[x] = calc(mod, x, rounds)
+    }
+
+     #(1..rounds).each{|round|
+      #@new_signal = Hash.new(0)
+      #mod.each{|output_index, l|
+        #@new_signal[output_index] = l.map{|sign, x|
+          #val = @signal[x]
+          #sign == :+ ? val : -val
+        #}.reduce(&:+).abs % 10
+      #}
+
+      #@signal = @new_signal #.map{|x| x.abs % 10}
+    #}
+
+    #p [:new_signal, @new_signal]
+
+    @signal = @new_signal
+  end
+
+
+  def calc(mod, x, phase)
+    return @signal[x] if phase.zero?
+
+    return @calc_hash[[x, phase]] if @calc_hash.key?([x, phase])
+
+    @calc_hash[[x, phase]] = mod[x].map{|sign, y|
+      val = calc(mod, y, phase - 1)
+      val *= -1 if sign == :-
+      val
+    }.reduce(&:+).abs % 10
   end
 
   def digits(n, offset = 0)
-    @signal[offset..offset + n - 1].map(&:abs).map{|x| x % 10}.map(&:to_s).reduce(&:+)
+    (offset..offset + n - 1).map{|x| @signal[x]}.map(&:abs).map{|x| x % 10}.map(&:to_s).reduce(&:+)
   end
 
   def digits_with_offset(n)
     digits(n, @check_offset)
-  end
-
-  def adjust_signs(globsign, list)
-    return list if globsign == :+
-
-    list.map{|sign, val|
-      [sign == :+ ? :- : :+, val]
-    }
-  end
-
-  def apply_memo(mod, round, list)
-    #p [:apply_memo,round,list,@memo]
-    m = @memo[[round, list]]
-    if m.nil?
-      @memo[[round, list]] = apply(mod, round, list)
-    end
-    @memo[[round, list]]
-  end
-
-  def apply(mod, round, list)
-
-    if round == 0
-      ret = (list.map{|sublist|
-        sublist.map{|sign, n|
-          sign == :+ ? @signal[n] : -@signal[n]
-        }.reduce(:+).abs % 10
-      })
-      return ret
-    end
-
-    return list.map{|sublist|
-      sublist.map{|sign, n|
-        a = apply_memo(mod, round - 1, [mod[n]]).first
-        sign == :+ ? a : -a
-      }.reduce(&:+).abs % 10
-    }
-
   end
 end
