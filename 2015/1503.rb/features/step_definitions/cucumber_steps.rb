@@ -9,6 +9,5 @@ Given('the itinerary in file {string}') do |string|
 end
 
 Then('{int} Santa\(s) would visit {int} houses') do |int, int2|
-  @itinerary.run(int)
-  expect(@itinerary.number_of_houses).to eq(int2)
+  expect(@itinerary.run(int)).to eq(int2)
 end

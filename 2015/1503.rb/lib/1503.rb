@@ -4,7 +4,6 @@
 class Itinerary
   def initialize(string)
     @str = string
-    @houses = Set[[0, 0]]
   end
 
   def self.from_file(filename)
@@ -14,19 +13,18 @@ class Itinerary
 
   def run(nb_santas)
     santas = Array.new(nb_santas, [0, 0])
+    @houses = Set[[0, 0]]
 
     @str.each_char.with_index{|c, i|
       current = i % santas.size
-      santas[current] = add(santas[current], c)
+      santas[current] = move_from(santas[current], c)
       @houses += [santas[current]]
     }
-  end
 
-  def number_of_houses
     @houses.size
   end
 
-  def add(pos, chr)
+  def move_from(pos, chr)
     x, y = pos
 
     case chr
