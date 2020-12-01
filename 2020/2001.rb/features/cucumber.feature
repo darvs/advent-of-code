@@ -4,9 +4,16 @@ Feature: Report Repair
 
 	Scenario: Part 1 smol case
 		Given the number in file '2001.smol.in'
-		Then the answer would be 514579
+		Then the multiplication of 2 numbers would be 514579
 
 	Scenario: Part 1
 		Given the number in file '2001.in'
-		Then the answer would be 121396
+		Then the multiplication of 2 numbers would be 121396
 
+	Scenario: Part 2 smol case
+		Given the number in file '2001.smol.in'
+		Then the multiplication of 3 numbers would be 241861950
+
+	Scenario: Part 2 
+		Given the number in file '2001.in'
+		Then the multiplication of 3 numbers would be 73616634
