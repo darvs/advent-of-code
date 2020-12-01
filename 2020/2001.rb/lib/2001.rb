@@ -7,7 +7,7 @@ class Expense
   end
 
   def self.from_file(filename)
-    new(File.readlines(File.join('data', filename))
+    new(File.readlines(File.join("data", filename))
       .map(&:strip).map(&:to_i))
   end
 
