@@ -12,23 +12,22 @@ class Passwords
   end
 
   def parse(string)
-    /([[:digit:]]+)-([[:digit:]]+) ([[:alpha:]]): ([[:alpha:]]+).*/
-      .match(string)
+    matches = /([[:digit:]]+)-([[:digit:]]+) ([[:alpha:]]): ([[:alpha:]]+)/
+              .match(string)
+    [matches[1].to_i, matches[2].to_i, matches[3], matches[4]]
   end
 
-  def rule1(matches)
-    _, lo, hi, ch, passwd = *matches
-    passwd.chars.count(ch).between?(lo.to_i, hi.to_i)
+  def rule1(lo, hi, ch, passwd)
+    passwd.chars.count(ch).between?(lo, hi)
   end
 
-  def rule2(matches)
-    _, first, second, ch, passwd = *matches
-    (passwd[first.to_i - 1] == ch) ^ (passwd[second.to_i - 1] == ch)
+  def rule2(first, second, ch, passwd)
+    (passwd[first - 1] == ch) ^ (passwd[second - 1] == ch)
   end
 
   def check(rule)
     @list.select{|matches|
-      self.method([:rule1, :rule2][rule - 1]).call(matches)
+      self.method([:rule1, :rule2][rule - 1]).call(*matches)
     }.count
   end
 end
