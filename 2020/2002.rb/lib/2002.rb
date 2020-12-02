@@ -28,12 +28,7 @@ class Passwords
 
   def check(rule)
     @list.select{|matches|
-      case rule
-      when 1
-        rule1(matches)
-      when 2
-        rule2(matches)
-      end
+      self.method([:rule1, :rule2][rule - 1]).call(matches)
     }.count
   end
 end
