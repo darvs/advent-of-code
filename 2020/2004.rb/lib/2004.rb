@@ -42,20 +42,20 @@ class Passports
   end
 
   def year_between(year, from, to)
-    valid = year.match?(/\d{4}/) && year.to_i.between?(from, to)
+    valid = year.match?(/\A\d{4}\Z/) && year.to_i.between?(from, to)
     puts "validate #{year} #{from},#{to} #{valid}"
     valid
   end
 
   def validate_height(height)
-    valid = (height.match?(/\d+cm/) && height.to_i.between?(150, 193)) ||
-      (height.match(/\d+in/) && height.to_i.between?(59, 76))
+    valid = (height.match?(/\A\d+cm\Z/) && height.to_i.between?(150, 193)) ||
+      (height.match(/\A\d+in\Z/) && height.to_i.between?(59, 76))
     puts "validate height #{height} #{valid}"
     valid
   end
 
   def validate_hcl(hcl)
-    valid = hcl.match?(/#[0-9a-f]{6}/)
+    valid = hcl.match?(/\A#[0-9a-f]{6}\Z/)
     puts "validate hcl #{hcl} #{valid}"
     valid
   end
@@ -67,7 +67,7 @@ class Passports
   end
 
   def validate_pid(pid)
-    valid = pid.match?(/\d{9}/)
+    valid = pid.match?(/\A\d{9}\Z/)
     puts "validate pid #{pid} #{valid}"
     valid
   end
