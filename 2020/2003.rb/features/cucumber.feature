@@ -15,4 +15,4 @@ Feature: Toboggan Trajectory
 	Scenario: Part 2
 		Given the tree field in file '2003.in'
 		And a pre-defined list of slopes
-		Then you would encounter 0 trees 
+		Then you would encounter 5813773056 trees 
