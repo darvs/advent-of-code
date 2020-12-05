@@ -13,22 +13,8 @@ class BoardingPasses
 
   def run(list)
     list.map{|p|
-      strrow = p[0, 7]
-      strcol = p[7, 3]
-
-      row = 0
-      strrow.chars{|c|
-        row *= 2
-        row += c == 'B' ? 1 : 0
-      }
-
-      col = 0
-      strcol.chars{|c|
-        col *= 2
-        col += c == 'R' ? 1 : 0
-      }
-
-      row * 8 + col
+      p.chars.map{|bit| %w[B R].include?(bit) ? 1 : 0 }
+       .reduce{|sum, n| sum * 2 + n}
     }
   end
 
