@@ -1,0 +1,51 @@
+Feature: Day 6: Custom Customs
+
+	For each group, count the number of questions to which anyone answered "yes". What is the sum of those counts?
+
+	Scenario: Part 1 small case
+		Given the custom declarations in '2006.smol.in'
+		Then the sum of the counts is 11
+
+	Scenario: Part 1
+		Given the custom declarations in '2006.in'
+		Then the sum of the counts is 6911
+
+	Scenario: Part 2 small case
+		Given the custom declarations in '2006.smol.in'
+		Then the sum of the questions to which everyone in a group answered yes is 6
+
+	Scenario: Part 2
+		Given the custom declarations in '2006.smol.in'
+		Then the sum of the questions to which everyone in a group answered yes is 6
+
+	#Scenario: Part 1
+		#Given the boarding passes in '2005.in'
+		#Then the highest ID would be 974
+
+	#Scenario: Part 2
+		#Given the boarding passes in '2005.in'
+		#Then my boarding pass ID would be 646
+
+	#Scenario: Part 1
+		#Given the passports in file '2004.in'
+		#Then there would be 230 valid passports
+
+	#Scenario: Part 2 small case
+		#Given the passports in file '2004.smol2.in'
+		#And stricter validation
+		#Then there would be 4 valid passports
+
+	#Scenario: Part 2
+		#Given the passports in file '2004.in'
+		#And stricter validation
+		#Then there would be 0 valid passports
+
+	#Scenario: Part 1
+		#Given the tree field in file '2003.in'
+		#And the slope right 3, down 1
+		#Then you would encounter 234 trees 
+
+	#Scenario: Part 2
+		#Given the tree field in file '2003.in'
+		#And a pre-defined list of slopes
+		#Then you would encounter 5813773056 trees 
