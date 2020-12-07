@@ -60,4 +60,24 @@ class Handbags
     }
   end
 
+  def contain_part2
+    count2('shiny', 'gold')
+  end
+
+  def count2(adj, col)
+    puts "COUNT2:: #{adj},#{col}"
+    return 1 if adj == 'no'
+
+    @hash.map{|k, v|
+      if k['adjective'] == adj && k['color'] == col
+        v.map{|bag|
+          puts "BAG:: #{bag}"
+          qty = bag['qty'].to_i
+          qty + qty * count2(bag['adjective'], bag['color'])
+        }.sum
+      else
+        0
+      end
+    }.sum
+  end
 end
