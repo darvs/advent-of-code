@@ -4,7 +4,6 @@
 class CPU
   attr_accessor :acc
   attr_accessor :pc
-  attr_accessor :program
 
   def initialize(list)
     @program = []
@@ -88,51 +87,43 @@ end
 class Debugger < CPU
   def check_loop
     @seen = Set.new
-    puts "Program: #{@program}"
-    until @seen.include?(@pc)
-      puts "PC:#{@pc} ACC:#{@acc} #{@program[@pc].op} #{@program[@pc].arg}"
+    #puts "Program: #{@program}"
+    until @seen.include?(@pc) || @pc >= @program.length
+      #puts "PC:#{@pc} ACC:#{@acc} #{@program[@pc].op} #{@program[@pc].arg}"
       @seen.add(@pc)
       run_next
-      puts "PC:#{@pc} ACC:#{@acc}"
+      #puts "PC:#{@pc} ACC:#{@acc}"
     end
 
     @acc
-  end
-
-  def store
-    puts "STORING #{@pc} #{@acc} #{@seen}"
-    @stored_pc = @pc
-    @stored_acc = @acc
-    @stored_seen = @seen
-  end
-
-  def load
-    @pc = @stored_pc
-    @acc = @stored_acc
-    @seen = @stored_seen
-    puts "LOADING #{@pc} #{@acc} #{@seen}"
   end
 
   def debug
-    @seen = Set.new
-    puts "Program: #{@program}"
-    until @pc == @program.length
-      puts "PC:#{@pc} ACC:#{@acc} #{@program[@pc].op} #{@program[@pc].arg}"
-      
-      load if @seen.include?(@pc)
-      
-      @seen.add(@pc)
+    @original_pgm = @program.clone
 
-      if %w[nop jmp].include?(fetch.op)
-        store
-        run(Instruction.from_op(fetch.op == 'nop' ? 'jmp' : 'op', fetch.arg))
+    list = @program.map.with_index{|ins, index|
+      %w[nop jmp].include?(ins.op) ? index : -1
+    }.reject{|num| num == -1}
+    #puts list
+
+    list.each{|num|
+      @program = @original_pgm.clone
+      @pc = 0
+      @acc = 0
+
+      # Swap one instruction
+      change = @program[num]
+      if change.op == 'nop'
+        @program[num] = JMP.new('jmp', change.arg)
       else
-        run_next
+        @program[num] = NOP.new('nop', change.arg)
       end
 
-      puts "PC:#{@pc} ACC:#{@acc}"
-    end
+      check_loop
 
-    @acc
+      return @acc if @pc >= @program.length
+    }
+
+    -1
   end
 end

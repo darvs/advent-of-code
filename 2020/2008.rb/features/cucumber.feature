@@ -13,3 +13,7 @@ Feature: Day 8: Handheld Halting
 	Scenario: Part 2 small case
 		Given the program in '2008.smol.in'
 		Then 8 is in the accumulator at the end when the program is debugged.
+
+	Scenario: Part 2
+		Given the program in '2008.in'
+		Then 2188 is in the accumulator at the end when the program is debugged.
