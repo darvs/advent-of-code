@@ -4,6 +4,7 @@
 class CPU
   attr_accessor :acc
   attr_accessor :pc
+  attr_accessor :program
 
   def initialize(list)
     @program = []
@@ -24,8 +25,16 @@ class CPU
     }
   end
 
+  def fetch
+    @program[@pc]
+  end
+
+  def run(instruction)
+    instruction.execute(self)
+  end
+
   def run_next
-    @program[@pc].execute(self)
+    fetch.execute(self)
   end
 end
 
@@ -78,12 +87,49 @@ end
 # A debugger for our CPU
 class Debugger < CPU
   def check_loop
-    seen = Set.new
+    @seen = Set.new
     puts "Program: #{@program}"
-    until seen.include?(@pc)
+    until @seen.include?(@pc)
       puts "PC:#{@pc} ACC:#{@acc} #{@program[@pc].op} #{@program[@pc].arg}"
-      seen.add(@pc)
+      @seen.add(@pc)
       run_next
+      puts "PC:#{@pc} ACC:#{@acc}"
+    end
+
+    @acc
+  end
+
+  def store
+    puts "STORING #{@pc} #{@acc} #{@seen}"
+    @stored_pc = @pc
+    @stored_acc = @acc
+    @stored_seen = @seen
+  end
+
+  def load
+    @pc = @stored_pc
+    @acc = @stored_acc
+    @seen = @stored_seen
+    puts "LOADING #{@pc} #{@acc} #{@seen}"
+  end
+
+  def debug
+    @seen = Set.new
+    puts "Program: #{@program}"
+    until @pc == @program.length
+      puts "PC:#{@pc} ACC:#{@acc} #{@program[@pc].op} #{@program[@pc].arg}"
+      
+      load if @seen.include?(@pc)
+      
+      @seen.add(@pc)
+
+      if %w[nop jmp].include?(fetch.op)
+        store
+        run(Instruction.from_op(fetch.op == 'nop' ? 'jmp' : 'op', fetch.arg))
+      else
+        run_next
+      end
+
       puts "PC:#{@pc} ACC:#{@acc}"
     end
 
