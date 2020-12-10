@@ -8,7 +8,7 @@ Feature: Day 10: Adapter Array
 
 	Scenario: Part 1
 		Given the numbers in '2010.in'
-		Then the number of 1-jolt diff. times the number of 3-jolt diff. is 0
+		Then the number of 1-jolt diff. times the number of 3-jolt diff. is 1890
 
 	Scenario: Part 2 tiny case
 		Given the numbers in '2010.tiny.in'

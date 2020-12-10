@@ -29,28 +29,16 @@ class Adapters
   end
 
   def part2
-    device = @list.max + 3
-    newlist = @list.sort + [device]
-    #puts "newlist #{newlist}"
-
-    @memo = Hash.new(-1)
-    br = branch(0, newlist)
-    #puts "branch #{br}"
-    #puts "memo #{@memo}"
-
-    br
+    branch(0, @list.max + 3, Hash.new(-1))
   end
 
-  def branch(start, newlist)
-    return 1 if start == newlist.max
+  def branch(start, device, memo)
+    return memo[start] if memo[start] >= 0
 
-    return @memo[start] if @memo[start] >= 0
+    memo[start] = [1, 2, 3].map{|n|
+      return 1 if start + n == device
 
-    res = [1, 2, 3].map{|n|
-      newlist.include?(start + n) ? branch(start + n, newlist) : 0
+      @list.include?(start + n) ? branch(start + n, device, memo) : 0
     }.sum
-
-    @memo[start] = res
-    res
   end
 end
