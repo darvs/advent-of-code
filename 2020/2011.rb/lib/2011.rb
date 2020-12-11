@@ -11,27 +11,28 @@ class Seats
       .map(&:strip))
   end
 
-  def run_til_stable
+  def run_til_stable(tolerance, infinite)
     state = @list.join
-    newstate = ""
+    newstate = ''
 
     while newstate != state
       state = newstate
-      newstate = run.join
+      newstate = run(tolerance, infinite).join
     end
 
-    puts "last #{state}"
+    #puts "last #{state}"
 
-    state.chars.select{|x| x=='#'}.count
+    state.chars.select{|x| x == '#'}.count
   end
 
-  def run
+  def run(tolerance, infinite)
+    #puts("run #{tolerance} #{infinite}")
     new_list = @list.map.with_index{|line, y|
       line.chars.map.with_index{|chair, x|
-        occ = occupied_next(y, x)
+        occ = occupied_next(y, x, infinite)
         if chair == 'L' && occ.zero?
           '#'
-        elsif chair == '#' && occ >= 4
+        elsif chair == '#' && occ >= tolerance
           'L'
         else
           chair
@@ -44,17 +45,23 @@ class Seats
     @list
   end
 
-  def occupied?(y, x)
-    y.between?(0, @list.length - 1) &&
-      x.between?(0, @list[0].length - 1) &&
-      @list[y][x] == '#' ? 1 : 0
+  def occupied?(y, x, dy, dx, infinite)
+    return 0 unless y.between?(0, @list.length - 1)
+
+    return 0 unless x.between?(0, @list[0].length - 1)
+
+    return 1 if @list[y][x] == '#'
+
+    return 0 if @list[y][x] == 'L'
+
+    return 0 unless infinite == true
+
+    occupied?(y + dy, x + dx, dy, dx, infinite)
   end
 
-  def occupied_next(y, x)
-    [[y - 1, x - 1], [y - 1, x], [y - 1, x + 1],
-     [y, x - 1], [y, x + 1],
-     [y + 1, x - 1], [y + 1, x], [y + 1, x + 1]].map{|y1, x1| occupied?(y1, x1)}.sum
+  def occupied_next(y, x, infinite)
+    [[-1, -1], [-1, 0], [-1, 1],
+     [0, -1], [0, 1],
+     [1, -1], [1, 0], [1, 1]].map{|dy, dx| occupied?(y + dy, x + dx, dy, dx, infinite)}.sum
   end
-
-  
 end
