@@ -26,10 +26,10 @@ class Seats
   end
 
   def run
-    newList = @list.map.with_index{|line, y|
+    new_list = @list.map.with_index{|line, y|
       line.chars.map.with_index{|chair, x|
         occ = occupied_next(y, x)
-        if chair == 'L' && occ == 0
+        if chair == 'L' && occ.zero?
           '#'
         elsif chair == '#' && occ >= 4
           'L'
@@ -38,7 +38,7 @@ class Seats
         end
       }.join
     }
-    @list = newList
+    @list = new_list
     #puts "--------------------------"
     #puts @list
     @list
@@ -51,15 +51,10 @@ class Seats
   end
 
   def occupied_next(y, x)
-    n = occupied?(y-1, x-1)
-    n += occupied?(y-1, x)
-    n += occupied?(y-1, x+1)
-    n += occupied?(y, x-1)
-    n += occupied?(y, x+1)
-    n += occupied?(y+1, x-1)
-    n += occupied?(y+1, x)
-    n += occupied?(y+1, x+1)
-    #puts "#{y},#{x} #{n}"
-    n
+    [[y - 1, x - 1], [y - 1, x], [y - 1, x + 1],
+     [y, x - 1], [y, x + 1],
+     [y + 1, x - 1], [y + 1, x], [y + 1, x + 1]].map{|y1, x1| occupied?(y1, x1)}.sum
   end
+
+  
 end

@@ -8,4 +8,4 @@ Feature: Day 11: Seating System
 
 	Scenario: Part 1
 		Given the seats in '2011.in'
-		Then 0 people would be seated once everybody stops moving
+		Then 2324 people would be seated once everybody stops moving
