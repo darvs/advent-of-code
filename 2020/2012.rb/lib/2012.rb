@@ -40,11 +40,11 @@ class Manhattan
 
   def distance
     #puts "#{@list}"
-    #puts "x,y : #{@x}, #{@y}  wx,wy : #{@wx}, #{@wy}"
+    #puts "x,y : #{@x}, #{@y}  dx,dy : #{@dx}, #{@dy}"
 
-    @list.each{|ins, num| 
+    @list.each{|ins, num|
       step(ins, num)
-      #puts "x,y : #{@x}, #{@y}  wx,wy : #{@wx}, #{@wy}"
+      #puts "x,y : #{@x}, #{@y}  dx,dy : #{@dx}, #{@dy}"
     }
 
     @x.abs + @y.abs
@@ -54,51 +54,45 @@ end
 class Manhattan_waypoint < Manhattan
 
   def initialize(list)
-    @wx = 10
-    @wy = 1
+    @dx = 10
+    @dy = 1
     super
   end
 
   def step(ins, num)
     case ins
     when 'N'
-      @wy += num
+      @dy += num
     when 'E'
-      @wx += num
+      @dx += num
     when 'W'
-      @wx -= num
+      @dx -= num
     when 'S'
-      @wy -= num
+      @dy -= num
     when 'L'
       turn_clockwise(360 - num)
     when 'R'
       turn_clockwise(num)
     when 'F'
-      dx = @wx - @x
-      dy = @wy - @y
-
-      @x += dx * num
-      @y += dy * num
-
-      @wx = @x + dx
-      @wy = @y + dy
+      @x += @dx * num
+      @y += @dy * num
     end
   end
 
   def turn_clockwise(degrees)
-    dx = @wx - @x
-    dy = @wy - @y
+    dx0 = @dx
+    dy0 = @dy
 
     case degrees
     when 90
-      @wx = @x + dy
-      @wy = @y - dx
+      @dx = dy0
+      @dy = 0 - dx0
     when 180
-      @wx = @x - dx
-      @wy = @y - dy
+      @dx = 0 - dx0
+      @dy = 0 - dy0
     when 270
-      @wx = @x - dy
-      @wy = @y + dx
+      @dx = 0 - dy0
+      @dy = dx0
     end
   end
 end
