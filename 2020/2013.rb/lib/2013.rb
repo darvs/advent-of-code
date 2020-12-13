@@ -19,10 +19,10 @@ class Bus1 < Bus
   end
 
   def run
-    puts ["timestamp, buses #{@timestamp}, #{@buses}"]
+    #puts ["timestamp, buses #{@timestamp}, #{@buses}"]
     list = @buses.map{|n| [n, n + (n * (@timestamp / n)) - @timestamp]}
                  .sort_by{|_, wait| wait}
-    puts list.to_s
+    #puts list.to_s
     list[0][0] * list[0][1]
   end
 end
@@ -36,27 +36,20 @@ class Bus2 < Bus
   end
 
   def run
-    puts ["buses #{@buses}"]
+    cycle, offset = @buses.first
 
-    cycle_len, offset = @buses.first
+    #puts "[cycle length] [#{cycle}] buses #{@buses}"
 
-    puts "[cycle length] [#{cycle_len}] buses #{@buses}"
-
-    find_next(0, cycle_len, @buses.drop(1)) - offset
+    find_next(0, cycle, @buses.drop(1)) - offset
   end
 
-  def find_next(current, cycle_len, list)
-    puts "current #{current} list #{list}"
+  def find_next(current, cycle, list)
     return current if list.empty?
 
-    x, i = list[0]
+    bus_cycle, delay = list.first
 
-    puts "#{current} vs #{x},#{i}"
+    current += cycle while (current + delay) % bus_cycle != 0
 
-    while (current + i) % x != 0
-      current += cycle_len
-    end
-
-    find_next(current, cycle_len.lcm(x), list.drop(1))
+    find_next(current, cycle.lcm(bus_cycle), list.drop(1))
   end
 end
