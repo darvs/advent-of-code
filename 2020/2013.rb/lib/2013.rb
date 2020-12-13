@@ -38,18 +38,14 @@ class Bus2 < Bus
   def run
     cycle, offset = @buses.first
 
-    #puts "[cycle length] [#{cycle}] buses #{@buses}"
+    @buses.drop(1).each.with_object(current: 0, cycle: cycle){|bus, hash|
+      bus_cycle, delay = bus
 
-    find_next(0, cycle, @buses.drop(1)) - offset
-  end
+      #puts "#{current} #{cycle} #{bus_cycle} #{delay}"
 
-  def find_next(current, cycle, list)
-    return current if list.empty?
+      hash[:current] += hash[:cycle] until ((hash[:current] + delay) % bus_cycle).zero?
 
-    bus_cycle, delay = list.first
-
-    current += cycle while (current + delay) % bus_cycle != 0
-
-    find_next(current, cycle.lcm(bus_cycle), list.drop(1))
+      hash[:cycle] = hash[:cycle].lcm(bus_cycle)
+    }[:current] - offset
   end
 end
