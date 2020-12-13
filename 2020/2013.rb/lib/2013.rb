@@ -35,50 +35,28 @@ class Bus2 < Bus
                        .map{|x, i| [x.to_i, i.to_i]}]
   end
 
-  def run_from(start)
+  def run
     puts ["buses #{@buses}"]
 
-    # We'll adjust the start so that it fits a multiple of the base
-    base = @buses[0][0]
-    start += base - (start % base)
+    cycle_len, offset = @buses.first
 
-    offset = @buses[0][1]
-    @buses = @buses[1..-1]
+    puts "[cycle length] [#{cycle_len}] buses #{@buses}"
 
-    puts "[base] [#{base}] buses #{@buses}"
-
-    #while true
-      ##puts start
-      #break if @buses.all?{|x, i|
-         ##puts x
-         #(start + i - offset) % x == 0
-      #}
-      #start += base
-    #end
-
-    #start - offset
-    
-    start = find_next(base, base, @buses)
-    start - offset
+    find_next(0, cycle_len, @buses.drop(1)) - offset
   end
 
-  def find_next(start, base, list)
-    puts "start #{start} list #{list}"
-    return start if list.empty?
-
-    #base = start
-    current = start
+  def find_next(current, cycle_len, list)
+    puts "current #{current} list #{list}"
+    return current if list.empty?
 
     x, i = list[0]
 
     puts "#{current} vs #{x},#{i}"
 
     while (current + i) % x != 0
-      current += base
+      current += cycle_len
     end
 
-    puts "current #{current}"
-
-    find_next(current, base.lcm(x), list[1..-1])
+    find_next(current, cycle_len.lcm(x), list.drop(1))
   end
 end

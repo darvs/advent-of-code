@@ -16,16 +16,13 @@ Feature: Day 13: Shuttle Search
 
 	Scenario: Part 2 small case
 		Given the bus routes in '2013.smol.in'
-		And starting at 0
 		Then the earliest timestamp to fit the restrictions would be 1068781
 
 	Scenario: Part 2 small case
 		Given the bus routes in '2013.smol2.in'
-		And starting at 1200000000
 		Then the earliest timestamp to fit the restrictions would be 1202161486
 
 	Scenario: Part 2
 		Given the bus routes in '2013.in'
-		And starting at 100000000000000
 		Then the earliest timestamp to fit the restrictions would be 775230782877242
 
