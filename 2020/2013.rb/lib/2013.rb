@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Manhattan
+# Bus
 class Bus
   def initialize(list)
     @timestamp, @buses = parse(list)
@@ -39,26 +39,46 @@ class Bus2 < Bus
     puts ["buses #{@buses}"]
 
     # We'll adjust the start so that it fits a multiple of the base
-    @buses = @buses.sort_by{|n, _| n}.reverse
     base = @buses[0][0]
-
-    bus0 = @buses[0][0]
-    start += bus0 - (start % bus0)
+    start += base - (start % base)
 
     offset = @buses[0][1]
     @buses = @buses[1..-1]
 
-    puts "base, buses #{base}, #{@buses}"
+    puts "[base] [#{base}] buses #{@buses}"
 
-    while true
-      #puts start
-      break if @buses.all?{|x, i|
-         #puts x
-         (start + i - offset) % x == 0
-      }
-      start += base
+    #while true
+      ##puts start
+      #break if @buses.all?{|x, i|
+         ##puts x
+         #(start + i - offset) % x == 0
+      #}
+      #start += base
+    #end
+
+    #start - offset
+    
+    start = find_next(base, base, @buses)
+    start - offset
+  end
+
+  def find_next(start, base, list)
+    puts "start #{start} list #{list}"
+    return start if list.empty?
+
+    #base = start
+    current = start
+
+    x, i = list[0]
+
+    puts "#{current} vs #{x},#{i}"
+
+    while (current + i) % x != 0
+      current += base
     end
 
-    start - offset
+    puts "current #{current}"
+
+    find_next(current, base.lcm(x), list[1..-1])
   end
 end
