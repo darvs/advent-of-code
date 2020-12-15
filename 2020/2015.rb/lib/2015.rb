@@ -22,10 +22,6 @@ class ElvesGame
     rest = list.drop(1)
 
     index = rest.find_index(head)
-    if index.nil?
-      run_list(n - 1, [0] + list)
-    else
-      run_list(n - 1, [index+1] + list)
-    end
+    run_list(n - 1, [index.nil? ? 0 : index + 1] + list)
   end
 end
