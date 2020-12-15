@@ -11,24 +11,18 @@ class ElvesGame
   end
 
   def run(n)
-    seen = Hash.new
-    i = 0
-    @list[0..-2].each{|x|
+    seen = {}
+    @list.each.with_index{|x, i|
       seen[x] = i
-      i += 1
     }
-    last = @list[-1]
-    puts "# #{i} last #{last} seen #{seen}"
+    last = 0
 
-    while i < n - 1
-      x = seen[last]
+    (@list.length..n - 2).each{|i|
+      last_seen = seen[last]
       seen[last] = i
-      last = x.nil? ? 0 : i - x
-      #puts "+ #{last}"
-      i += 1
-    end
+      last = last_seen.nil? ? 0 : i - last_seen
+    }
 
-    puts seen.to_s
     last
   end
 end

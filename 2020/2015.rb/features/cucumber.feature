@@ -18,6 +18,6 @@ Feature: Day 15: Rambunctious Recitation
 		Given the list "0,5,4,1,10,14,7"
 		Then the 2020th number will be 203
 
-	Scenario: Part 1
+	Scenario: Part 2
 		Given the list "0,5,4,1,10,14,7"
 		Then the 30000000th number will be 9007186 
