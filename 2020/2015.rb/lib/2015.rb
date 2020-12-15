@@ -7,21 +7,28 @@ class ElvesGame
   end
 
   def self.from_list(list)
-    new(list.split(',').map{|n| n.to_i}.reverse)
+    new(list.split(',').map(&:to_i))
   end
 
   def run(n)
-    run_list(n - @list.length, @list)
-  end
+    seen = Hash.new
+    i = 0
+    @list[0..-2].each{|x|
+      seen[x] = i
+      i += 1
+    }
+    last = @list[-1]
+    puts "# #{i} last #{last} seen #{seen}"
 
-  def run_list(n, list)
-    #puts "#{n} #{list}"
-    return list.first if n.zero?
+    while i < n - 1
+      x = seen[last]
+      seen[last] = i
+      last = x.nil? ? 0 : i - x
+      #puts "+ #{last}"
+      i += 1
+    end
 
-    head = list.first
-    rest = list.drop(1)
-
-    index = rest.find_index(head)
-    run_list(n - 1, [index.nil? ? 0 : index + 1] + list)
+    puts seen.to_s
+    last
   end
 end
