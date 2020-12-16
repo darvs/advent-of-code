@@ -8,6 +8,9 @@ Feature: Day 16: Ticket Translation
 
 	Scenario: Part 1
 		Given the tickets in '2016.in'
-		Then the scanning error rate is 0
+		Then the scanning error rate is 26941
 
+	Scenario: Part 2
+		Given the tickets in '2016.in'
+		Then the multiplication of departure values is 634796407951
 
