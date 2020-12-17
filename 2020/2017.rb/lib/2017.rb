@@ -1,4 +1,4 @@
-# iteral: true
+#frozen_string_literal: true
 
 # Seats
 class ConwayCubes
@@ -27,7 +27,7 @@ class ConwayCubes
   end
 
   def count
-    puts @hash.to_s
+    #puts @hash.to_s
     @hash.keys.map{|x|
       @hash[x].keys.map{|y|
         @hash[x][y].keys.map{|z|
@@ -39,29 +39,15 @@ class ConwayCubes
     }.sum
   end
 
-  #def neighbors(x, y, z, w)
-    #@hash[x - 1][y - 1][z - 1][0] + @hash[x - 1][y][z - 1][0] + @hash[x - 1][y + 1][z - 1][0] +
-      #@hash[x][y - 1][z - 1][0] + @hash[x][y][z - 1][0] + @hash[x][y + 1][z - 1][0] +
-      #@hash[x + 1][y - 1][z - 1][0] + @hash[x + 1][y][z - 1][0] + @hash[x + 1][y + 1][z - 1][0] +
-
-      #@hash[x - 1][y - 1][z][0] + @hash[x - 1][y][z][0] + @hash[x - 1][y + 1][z][0] +
-      #@hash[x][y - 1][z][0] +                      @hash[x][y + 1][z][0] +
-      #@hash[x + 1][y - 1][z][0] + @hash[x + 1][y][z][0] + @hash[x + 1][y + 1][z][0] +
-
-      #@hash[x - 1][y - 1][z + 1][0] + @hash[x - 1][y][z + 1][0] + @hash[x - 1][y + 1][ z + 1][0] +
-      #@hash[x][y - 1][z + 1][0] + @hash[x][y][z + 1][0] + @hash[x][y + 1][z + 1][0] +
-      #@hash[x + 1][y - 1][z + 1][0] + @hash[x + 1][y][z + 1][0] + @hash[x + 1][y + 1][ z + 1][0]
-  #end
-
   def neighbors(x, y, z, w)
     neigh = (-1..1).map{|dx|
       (-1..1).map{|dy|
         (-1..1).map{|dz|
           (-1..1).map{|dw|
-            if dx.zero? && dy.zero? && dz.zero? && dw.zero?
+            if [dx, dy, dz, dw].all?(&:zero?)
               0
             else
-              @hash[x+dx][y+dy][z+dz][w+dw]
+              @hash[x + dx][y + dy][z + dz][w + dw]
             end
           }.sum
         }.sum
@@ -72,51 +58,43 @@ class ConwayCubes
     neigh
   end
 
-  def run(cycles)
-    (1..cycles).each{|c| run_one(c)}
+  def run(cycles, dim)
+    (1..cycles).each{|c| run_one(c, dim)}
     count
   end
 
-  def run_one(cycle)
-    min = 0 - cycle
-    max = @size + cycle
-    zmin = -cycle
-    zmax = +cycle
-    #wmin = 0
-    #wmax = 0
-    wmin = -cycle
-    wmax = +cycle
+  def run_one(cycle, dim)
+    xy_min = 0 - cycle
+    xy_max = @size - 1 + cycle
+    z_min = -cycle
+    z_max = +cycle
 
-
-    puts "run_one"
+    case dim
+    when 3
+      w_min = 0
+      w_max = 0
+    when 4
+      w_min = -cycle
+      w_max = +cycle
+    end
 
     @next_hash = new_hash
 
-    (min..max).each{|x|
-      (min..max).each{|y|
-        (zmin..zmax).each{|z|
-          (wmin..wmax).each{|w|
+    (xy_min..xy_max).each{|x|
+      (xy_min..xy_max).each{|y|
+        (z_min..z_max).each{|z|
+          (w_min..w_max).each{|w|
             case @hash[x][y][z][w]
             when 1
               @next_hash[x][y][z][w] = [2, 3].include?(neighbors(x, y, z, w)) ? 1 : 0
             when 0
               @next_hash[x][y][z][w] = [3].include?(neighbors(x, y, z, w)) ? 1 : 0
-            else
-              puts "what?"
             end
           }
         }
       }
     }
 
-    #(zmin..zmax).each{|z|
-      #puts "z #{z}"
-      #(min..max).each{|y|
-        #puts (min..max).map{|x| @next_hash[x][y][z][0] == 1 ? '#' : '.'}.join
-      #}
-    #}
-
     @hash = @next_hash
   end
-
 end
