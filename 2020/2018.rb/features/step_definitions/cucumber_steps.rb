@@ -8,7 +8,7 @@ end
 Then(/^all answers should be verified$/) do
   @data.each{|row|
     #puts "eq #{row['priority']}, #{row['answer']} =? #{row['equation']}"
-    expect(Equation.parse(row['equation']).solve(nil, row['priority'].to_i)).to eq(row['answer'].to_i)
+    expect(Equation.with_priority(row['priority'].to_i).parse(row['equation']).solve).to eq(row['answer'].to_i)
   }
 end
 
@@ -22,5 +22,5 @@ Given(/^reverse operator priority$/) do
 end
 
 Then(/^the total should be (\d+)$/) do |arg1|
-  expect(EquationFile.from_file(@file).solve_all(@part)).to eq(arg1)
+  expect(EquationFile.from_file(@file).with_priority(@part).solve).to eq(arg1)
 end

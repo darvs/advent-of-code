@@ -4,6 +4,7 @@
 class EquationFile
   def initialize(list)
     @list = list
+    @part = 1
   end
 
   def self.from_file(filename)
@@ -11,30 +12,80 @@ class EquationFile
       .map(&:strip))
   end
 
-  def solve_all(part)
-    @list.map{|eq| Equation.parse(eq).solve(nil, part)}.sum
+  def with_priority(part)
+    @part = part
+    self
+  end
+
+  def solve
+    @list.map{|eq| Equation.with_priority(@part).parse(eq).solve}.sum
   end
 end
 
-
 # Equation
 class Equation
-  def initialize(list)
+  def initialize
     #puts "NEW EQUATION #{list}"
-    @list = list
+    @list = []
   end
 
-  def self.parse(str)
+  def parse(str)
     str = str.gsub('(', '( ').gsub(')', ' )')
-    new(str.split(' '))
+    @list = str.split(' ')
+    self
   end
 
-  def solve(cur, part)
-    @part = part
-    part == 1 ? solve1(cur) : solve2(cur)
+  def self.with_priority(part)
+    case part
+    when 1
+      EquationWithPriority1.new
+    when 2
+      EquationWithPriority2.new
+    end
   end
 
-  def solve1(cur)
+  def next_term
+    case @list.first
+    when '('
+      n = find_closing_paren
+      num = Equation.with_priority(@part).parse(@list.drop(1).take(n - 1).join(' ')).solve
+      #puts "sub #{num}"
+      @list = @list.drop(n + 1)
+      #puts "newlist #{@list}"
+    else
+      num = @list.first.to_i
+      @list = @list.drop(1)
+    end
+    num
+  end
+
+  def find_closing_paren
+    level = 1
+    num = 1
+    lst = @list.clone
+    lst.drop(1).each{|token|
+      case token
+      when '('
+        level += 1
+      when ')'
+        level -= 1
+        break num if level.zero?
+      end
+      num += 1
+    }
+    num
+  end
+
+end
+
+class EquationWithPriority1 < Equation
+
+  def initialize
+    @part = 1
+    super
+  end
+
+  def solve
     until @list.empty?
       #puts "list.f = #{@list.first}"
       case @list.first
@@ -50,8 +101,16 @@ class Equation
     end
     cur
   end
+end
 
-  def solve2(cur)
+class EquationWithPriority2 < Equation
+
+  def initialize
+    @part = 2
+    super
+  end
+
+  def solve
     #puts "solve2!"
 
     # Remove paren
@@ -95,39 +154,4 @@ class Equation
     list3.reject{|e| e == '*'}.map{|e| e.to_i}.reduce(&:*)
 
   end
-
-  def next_term
-    case @list.first
-    when '('
-      n = find_closing_paren
-      num = Equation.new(@list.drop(1).take(n - 1)).solve(nil, @part)
-      #puts "sub #{num}"
-      @list = @list.drop(n + 1)
-      #puts "newlist #{@list}"
-    else
-      num = @list.first.to_i
-      @list = @list.drop(1)
-    end
-    num
-  end
-
-  def find_closing_paren
-    level = 1
-    num = 1
-    lst = @list.clone
-    lst.drop(1).each{|token|
-      case token
-      when '('
-        level += 1
-      when ')'
-        level -= 1
-        break num if level.zero?
-      end
-      num += 1
-    }
-    num
-  end
-
 end
-
-
