@@ -45,18 +45,11 @@ class Equation
   # solve will solve the parens only and use the subclasses'
   # reduce methods to solve the rest according to the priority
   def solve
-    no_parens = []
-    until @list.empty?
-      case token = @list.slice!(0)
-      when '('
-        no_parens += [solve]
-      when ')'
-        return Equation.with_priority(@part).parse(no_parens).reduce
-      else
-        no_parens += [token]
-      end
+    while (rparen = @list.find_index(')'))
+      lparen = rparen - @list[0, rparen].reverse.find_index('(') - 1
+      sub = @list[lparen + 1..rparen - 1]
+      @list[lparen..rparen] = Equation.with_priority(@part).parse(sub).solve
     end
-    @list = no_parens
 
     reduce
   end
