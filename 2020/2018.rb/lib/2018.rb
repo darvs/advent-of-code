@@ -42,26 +42,23 @@ class Equation
     end
   end
 
-  # solve will solve the parens only and use the subclasses
-  # to solve the rest according to the priority
+  # solve will solve the parens only and use the subclasses'
+  # reduce methods to solve the rest according to the priority
   def solve
     no_parens = []
     until @list.empty?
-      token = @list.first
-      @list = @list.drop(1)
-
-      case token
+      case token = @list.slice!(0)
       when '('
         no_parens += [solve]
       when ')'
-        return Equation.with_priority(@part).parse(no_parens).solve_no_parens
+        return Equation.with_priority(@part).parse(no_parens).reduce
       else
         no_parens += [token]
       end
     end
     @list = no_parens
 
-    solve_no_parens
+    reduce
   end
 
   def next_token
@@ -76,18 +73,16 @@ class EquationWithNoPriority < Equation
     super
   end
 
-  def solve_no_parens
-    total = next_token.to_i
-
-    until @list.empty?
-      case next_token
-      when '+'
-        total += next_token.to_i
-      when '*'
-        total *= next_token.to_i
-      end
+  def reduce
+    while @list.length > 1
+      @list[0, 3] = case @list[1]
+                    when '+'
+                      @list[0].to_i + @list[2].to_i
+                    when '*'
+                      @list[0].to_i * @list[2].to_i
+                    end
     end
-    total
+    @list.first
   end
 end
 
@@ -98,12 +93,15 @@ class EquationWithPriorityPlus < Equation
     super
   end
 
-  def solve_no_parens
-    while @list.include?('+')
-      plus = @list.find_index('+')
+  def reduce
+    while (plus = @list.find_index('+'))
       @list[plus - 1, 3] = @list[plus - 1].to_i + @list[plus + 1].to_i
     end
 
-    @list.reject{|e| e == '*'}.map(&:to_i).reduce(&:*)
+    while (times = @list.find_index('*'))
+      @list[times - 1, 3] = @list[times - 1].to_i * @list[times + 1].to_i
+    end
+
+    @list.first
   end
 end
