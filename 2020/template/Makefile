@@ -1,2 +1,2 @@
 all:
-	cucumber
+	cucumber --snippet-type regexp

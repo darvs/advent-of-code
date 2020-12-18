@@ -14,6 +14,7 @@ ARG="${1}"
 SPLIT=("${(@s/./)ARG}") 
 NOEXT="${SPLIT[1]}"
 EXT="${SPLIT[2]}"
+COPY="${2}"
 
 PROJ="${BASE}/${1}"
 
@@ -33,3 +34,6 @@ from_template "lib/${ARG}" frozen_string_literal.rb
 from_template "features/support/env.rb" env.rb
 
 touch "${PROJ}"/data/"${NOEXT}".in
+
+[[ ! -z ${COPY} ]] && cp -Rv "${COPY}/features" "${PROJ}"
+[[ ! -z ${COPY} ]] && cp "${COPY}/lib"/*.rb "${PROJ}/lib/${1}"
