@@ -29,9 +29,8 @@ class Equation
     @list = []
   end
 
-  def parse(str)
-    str = str.gsub('(', '( ').gsub(')', ' )')
-    @list = str.split(' ')
+  def parse(str_or_list)
+    @list = str_or_list.is_a?(Array) ? str_or_list : str_or_list.gsub('(', '( ').gsub(')', ' )').split(' ')
     self
   end
 
@@ -44,11 +43,30 @@ class Equation
     end
   end
 
+  def solve_parens
+    no_parens = []
+    until @list.empty?
+      token = @list.first
+      @list = @list.drop(1)
+
+      case token
+      when '('
+        no_parens += [solve_parens]
+      when ')'
+        #no_parens += [Equation.with_priority(@part).parse(no_parens).solve]
+        return Equation.with_priority(@part).parse(no_parens).solve
+      else
+        no_parens += [token]
+      end
+    end
+    @list = no_parens
+  end
+
   def next_term
     case @list.first
     when '('
       n = find_closing_paren
-      num = Equation.with_priority(@part).parse(@list.drop(1).take(n - 1).join(' ')).solve
+      num = Equation.with_priority(@part).parse(@list.drop(1).take(n - 1)).solve
       #puts "sub #{num}"
       @list = @list.drop(n + 1)
       #puts "newlist #{@list}"
@@ -86,6 +104,7 @@ class EquationWithPriority1 < Equation
   end
 
   def solve
+    solve_parens
     until @list.empty?
       #puts "list.f = #{@list.first}"
       case @list.first
