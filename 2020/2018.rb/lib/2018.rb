@@ -25,7 +25,6 @@ end
 # Equation
 class Equation
   def initialize
-    #puts "NEW EQUATION #{list}"
     @list = []
   end
 
@@ -37,13 +36,15 @@ class Equation
   def self.with_priority(part)
     case part
     when 1
-      EquationWithPriority1.new
+      EquationWithNoPriority.new
     when 2
-      EquationWithPriority2.new
+      EquationWithPriorityPlus.new
     end
   end
 
-  def solve_parens
+  # solve will solve the parens only and use the subclasses
+  # to solve the rest according to the priority
+  def solve
     no_parens = []
     until @list.empty?
       token = @list.first
@@ -51,126 +52,66 @@ class Equation
 
       case token
       when '('
-        no_parens += [solve_parens]
+        no_parens += [solve]
       when ')'
-        #no_parens += [Equation.with_priority(@part).parse(no_parens).solve]
-        return Equation.with_priority(@part).parse(no_parens).solve
+        return Equation.with_priority(@part).parse(no_parens).solve_no_parens
       else
         no_parens += [token]
       end
     end
     @list = no_parens
+
+    solve_no_parens
   end
 
-  def next_term
-    case @list.first
-    when '('
-      n = find_closing_paren
-      num = Equation.with_priority(@part).parse(@list.drop(1).take(n - 1)).solve
-      #puts "sub #{num}"
-      @list = @list.drop(n + 1)
-      #puts "newlist #{@list}"
-    else
-      num = @list.first.to_i
-      @list = @list.drop(1)
-    end
-    num
+  def next_token
+    @list.slice!(0)
   end
-
-  def find_closing_paren
-    level = 1
-    num = 1
-    lst = @list.clone
-    lst.drop(1).each{|token|
-      case token
-      when '('
-        level += 1
-      when ')'
-        level -= 1
-        break num if level.zero?
-      end
-      num += 1
-    }
-    num
-  end
-
 end
 
-class EquationWithPriority1 < Equation
-
+# An Equation where + and * have equal priority
+class EquationWithNoPriority < Equation
   def initialize
     @part = 1
     super
   end
 
-  def solve
-    solve_parens
+  def solve_no_parens
+    total = next_token.to_i
+
     until @list.empty?
-      #puts "list.f = #{@list.first}"
-      case @list.first
+      case next_token
       when '+'
-        @list = @list.drop(1)
-        cur += next_term
+        total += next_token.to_i
       when '*'
-        @list = @list.drop(1)
-        cur *= next_term
-      else
-        cur = next_term
+        total *= next_token.to_i
       end
     end
-    cur
+    total
   end
 end
 
-class EquationWithPriority2 < Equation
-
+# An Equation where + has priority
+class EquationWithPriorityPlus < Equation
   def initialize
     @part = 2
     super
   end
 
-  def solve
-    #puts "solve2!"
-
-    # Remove paren
-    list2 = []
-    until @list.empty?
-      #puts "list.f = #{@list.first}"
-      case @list.first
-      when '+'
-        @list = @list.drop(1)
-        list2 += ['+']
-      when '*'
-        @list = @list.drop(1)
-        list2 += ['*']
-      else
-        list2 += [next_term]
-      end
-    end
-
-    #puts "list2a: #{list2}"
-    list3 = list2.dup
-
-    while list2.include?('+')
-      list3 = []
-      until list2.empty?
-        if list2.length > 1 and list2[1] == '+'
-          list3 += [list2[0].to_i + list2[2].to_i]
-          list2 = list2.drop(3)
-          #return Equation.new([list3] + [list2[0].to_i + list2[2].to_i] + list2.drop(3)).solve(nil, @part)
+  def solve_no_parens
+    while @list.include?('+')
+      no_plus = []
+      until @list.empty?
+        if @list.length > 1 && @list[1] == '+'
+          no_plus += [@list[0].to_i + @list[2].to_i]
+          3.times{next_token}
         else
-          list3 += [list2.first]
-          list2 = list2.drop(1)
+          no_plus += [next_token]
         end
       end
-      #puts "list3a #{list3}"
-      list2 = list3.dup
+      @list = no_plus.dup
     end
 
-    #puts "list2b: #{list2}"
-    #puts "list3: #{list3}"
-
-    list3.reject{|e| e == '*'}.map{|e| e.to_i}.reduce(&:*)
-
+    @list.reject{|e| e == '*'}.map(&:to_i).reduce(&:*)
   end
 end
