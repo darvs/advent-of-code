@@ -46,7 +46,7 @@ class Equation
   # reduce methods to solve the rest according to the priority
   def solve
     while (rparen = @list.find_index(')'))
-      lparen = rparen - @list[0, rparen].reverse.find_index('(') - 1
+      lparen = rparen - @list[0..rparen - 1].reverse.find_index('(') - 1
       sub = @list[lparen + 1..rparen - 1]
       @list[lparen..rparen] = Equation.with_priority(@part).parse(sub).solve
     end
