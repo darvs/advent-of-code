@@ -100,16 +100,8 @@ class EquationWithPriorityPlus < Equation
 
   def solve_no_parens
     while @list.include?('+')
-      no_plus = []
-      until @list.empty?
-        if @list.length > 1 && @list[1] == '+'
-          no_plus += [@list[0].to_i + @list[2].to_i]
-          3.times{next_token}
-        else
-          no_plus += [next_token]
-        end
-      end
-      @list = no_plus.dup
+      plus = @list.find_index('+')
+      @list[plus - 1, 3] = @list[plus - 1].to_i + @list[plus + 1].to_i
     end
 
     @list.reject{|e| e == '*'}.map(&:to_i).reduce(&:*)
