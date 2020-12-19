@@ -49,13 +49,13 @@ class Grammar
     rule = @rules[num]
     @msg = msg.dup
 
-    puts "rule #{rule}"
+    puts "#{num} rule #{rule}"
     if rule.length == 1
 
       # A character
-      if rule.flatten.first.is_a? String
+      if rule.first.first.is_a? String
         #puts "num #{num} rule #{rule} string @msg #{@msg} rule.f.f #{rule.flatten.first}"
-        if @msg[0] == rule.flatten.first
+        if @msg[0] == rule.first.first
           puts "#{num} TRUE rule #{rule} string @msg #{@msg} rule.f.f #{rule.flatten.first}"
           @msg = @msg[1..-1]
           return true
@@ -66,21 +66,21 @@ class Grammar
       else
         # A concatenation
         puts "#{num} concat #{rule.first}"
-        try = rule.first.all?{|r| check_rule(r, @msg)}
-        @msg = msg.dup if !try
-        return try
+        rule.first.all?{|r| check_rule(r, @msg)}
+        #@msg = msg.dup if !try
+        #return try
       end
 
     else
 
       # several parts separated with "|"
-      return rule.any?{|r|
+      return true if rule.any?{|r|
         puts "#{num} any #{rule} r #{r}"
         @msg = msg.dup
-        try = r.all?{|r2| check_rule(r2, @msg)}
-        @msg = msg.dup if !try
-        try
+        return true if r.all?{|r2| check_rule(r2, @msg)}
       }
+      #@msg = msg.dup
+      false
     end
   end
 
