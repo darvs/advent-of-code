@@ -6,6 +6,7 @@ class Puzzle
     @tiles = {}
     @edges = {}
     @flipped = {}
+    @merged = Hash.new{ |h, k| h[k] = Hash.new(0) }
     parse(lines)
   end
 
@@ -18,7 +19,7 @@ class Puzzle
     #puts lines.to_s
     until lines.empty? || lines.first.empty?
       m = /\ATile (?<tile>\d+):\Z/.match(lines.first)
-      tile = m[:tile].to_i
+      tile = m[:tile]
       lines.slice!(0)
 
       picture = []
@@ -43,15 +44,27 @@ class Puzzle
 
       @edges[id] = [top, right, bottom, left].map{|v| v.to_i(2)}
       @flipped[id] = [top, left, bottom, right].map{|v| v.reverse.to_i(2)}
+
+      @merged[id][0] = @edges[id]
+      @merged[id][1] = @flipped[id]
     }
+
+    puts "count edges #{@edges.keys.length} #flipped #{@flipped.keys.length}"
 
     #puts "edges #{@edges}"
     #puts "flipped #{@flipped}"
 
-    #occ = @edges.values.flatten.each_with_object(Hash.new(0)){|v, hash| hash[v] += 1}
-    #puts "occ #{occ}"
-    #occocc = occ.values.each_with_object(Hash.new(0)){|v, hash| hash[v] += 1}
-    #puts "occocc #{occocc}"
+    #puts "merged #{@merged}"
+    #puts @merged.values.map{|hash| hash.values.flatten}
+
+    [@edges, @flipped].each{|s|
+      occ = s.values.flatten.each_with_object(Hash.new(0)){|v, hash| hash[v] += 1}
+      puts "occ #{occ}"
+      occocc = occ.values.each_with_object(Hash.new(0)){|v, hash| hash[v] += 1}
+      puts "occocc #{occocc}"
+    }
+
+
   end
 
   def encode(chars)
@@ -60,6 +73,25 @@ class Puzzle
   end
 
   def multiply
+    mocc = @merged.values.map{|hash| hash.values.flatten}.flatten.each_with_object(Hash.new(0)){|v, hash| hash[v] += 1}
+    puts "mocc #{mocc}"
+    moccocc = mocc.values.each_with_object(Hash.new(0)){|v, hash| hash[v] += 1}
+    puts "moccocc #{moccocc}"
+
+    @merged.each.with_object(Hash.new{|k,v| k[v]=Hash.new(0)}){|(k, v), h|
+      v.each{|k2, v2|
+        puts "id #{k} [#{k2}] #{v2}"
+        h[k][k2] = v2.map{|v3| mocc[v3] == 1 ? v3 : nil}.to_a.tap{|x| puts "X #{x}"}
+        puts "H #{h}"
+      }
+      puts "hash: #{h}"
+    }.tap{|rez| puts "rez: #{rez}"}
+
+    0
+  end
+
+  def multiply0
+    return 0
     
     #puts "mult edges #{@edges}"
     #puts "mult flipped #{@flipped}"
