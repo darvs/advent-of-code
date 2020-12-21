@@ -81,13 +81,12 @@ class Puzzle
     @merged.each.with_object(Hash.new{|k,v| k[v]=Hash.new(0)}){|(k, v), h|
       v.each{|k2, v2|
         puts "id #{k} [#{k2}] #{v2}"
-        h[k][k2] = v2.map{|v3| mocc[v3] == 1 ? v3 : nil}.to_a.tap{|x| puts "X #{x}"}
+        h[k][k2] = v2.map{|v3| mocc[v3] == 1 ? v3 : nil}.to_a.reject{|v| v.nil?}.length.tap{|x| puts "X #{x}"}
         puts "H #{h}"
       }
       puts "hash: #{h}"
-    }.tap{|rez| puts "rez: #{rez}"}
+    }.select{|k,v| v.all?{|_,v2| v2==2}}.keys.map(&:to_i).tap{|rez| puts "rez: #{rez}"}.reduce(&:*)
 
-    0
   end
 
   def multiply0
