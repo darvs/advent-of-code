@@ -28,22 +28,22 @@ Feature: Day 19: Monster Messages
 		#Given the grammar and messages in file "2019.p2.smol2.in"
 		#Then 12 messages should be valid
 
-	#Scenario: Part 2 small messages
-		#Given the grammar in file "2019.p2.smol2.in"
-			#| message                                      | valid |
-			#| babaaaaabbbaba                               | 1     |
-			#| bbabbbbaabaabba                              | 1     |
-			#| babbbbaabbbbbabbbbbbaabaaabaaa               | 1     |
-			#| aabbbbbbaaaabaababaabababbabaaabbababababaaa | 1     |
-			#| bbbbbbbaaaabbbbaaabbabaaa                    | 1     |
-			#| bbbababbbbaaaaaaaabbababaaababaabab          | 1     |
-			#| ababaaaaaabaaab                              | 1     |
-			#| baabbaaaabbaaaababbaababb                    | 1     |
-			#| abbbbabbbbaaaababbbbbbaaaababb               | 1     |
-			#| aaaaabbaabaaaaababaa                         | 1     |
-			#| aaabbaabbaaaaaaabbbabbbaaabbaabaaa           | 1     |
-			#| aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba     | 1     |
-		#Then the messages should be validated
+	Scenario: Part 2 small messages
+		Given the grammar in file "2019.p2.smol2.in"
+			| message                                      | valid |
+			| babaaaaabbbaba                               | 1     |
+			| bbabbbbaabaabba                              | 1     |
+			| babbbbaabbbbbabbbbbbaabaaabaaa               | 1     |
+			| aabbbbbbaaaabaababaabababbabaaabbababababaaa | 1     |
+			| bbbbbbbaaaabbbbaaabbabaaa                    | 1     |
+			| bbbababbbbaaaaaaaabbababaaababaabab          | 1     |
+			| ababaaaaaabaaab                              | 1     |
+			| baabbaaaabbaaaababbaababb                    | 1     |
+			| abbbbabbbbaaaababbbbbbaaaababb               | 1     |
+			| aaaaabbaabaaaaababaa                         | 1     |
+			| aaabbaabbaaaaaaabbbabbbaaabbaabaaa           | 1     |
+			| aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba     | 1     |
+		Then the messages should be validated
 
 
 

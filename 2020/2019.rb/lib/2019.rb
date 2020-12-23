@@ -47,7 +47,7 @@ class Grammar
 
   def check_rule(num, msg)
     rule = @rules[num]
-    @msg = msg.dup
+    @msg = Marshal.load(Marshal.dump(msg))
 
     puts "#{num} rule #{rule}"
     if rule.length == 1
@@ -76,9 +76,11 @@ class Grammar
       # several parts separated with "|"
       return true if rule.any?{|r|
         puts "#{num} any #{rule} r #{r}"
-        @msg = msg.dup
+        #@msg = msg.dup
+        @msg = Marshal.load(Marshal.dump(msg))
         return true if r.all?{|r2| check_rule(r2, @msg)}
       }
+      @msg = Marshal.load(Marshal.dump(msg))
       #@msg = msg.dup
       false
     end
