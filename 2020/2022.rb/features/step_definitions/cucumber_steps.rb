@@ -7,3 +7,7 @@ end
 Then(/^the winning score would be (\d+)$/) do |arg1|
   expect(CrabCombat.from_file(@filename).winning).to eq(arg1.to_i)
 end
+
+Then(/^the winning score at recursive combat would be (\d+)$/) do |arg1|
+  expect(RecursiveCombat.from_file(@filename).winning).to eq(arg1.to_i)
+end
