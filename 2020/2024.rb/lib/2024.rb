@@ -22,7 +22,12 @@ class ODDR
 
   # Comparable
   def <=>(other)
-    (qcomp = include?(@q, other.q)).zero? ? @r <=> other.r : qcomp
+    qcomp = @q <=> other_q
+    qcomp.zero? ? @r <=> other.r : qcomp
+  end
+
+  def key
+    [@q, @r]
   end
 
   def move(dir)
@@ -87,7 +92,8 @@ class Tiles
   end
 
   def switched
-    @list.each_with_object(Hash.new(0)){|tile, hash| hash[tile.to_s] += 1}
+    @list.each_with_object(Hash.new(0)){|tile, hash| hash[tile.key] += 1}
+         #.tap{|rez| puts "rez #{rez}"}
          .select{|_, v| v.odd?}
          .length
   end
