@@ -12,7 +12,6 @@ class Depths
   end
 
   def run_with_sliding_size(sliding_size)
-    chunks = (0..(@list.length - sliding_size)).map{|i| @list[i, sliding_size].sum}
-    (0..(chunks.length - 2)).map{|i| chunks[i, 2]}.filter{|x, y| y > x}.count
+    @list.each_cons(sliding_size).map(&:sum).each_cons(2).filter{|x, y| y > x}.count
   end
 end
