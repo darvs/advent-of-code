@@ -14,19 +14,17 @@ class Depths
   def run
     increases = 0
     prev = @list.first
-    @list[1..].each{|current|
-      increases += 1 if current > prev
+    @list[1..].map{|current|
+      increases = current > prev ? 1 : 0
       prev = current
-    }
-    increases
+      increases
+    }.sum
   end
 
   def sliding
-    sliding = []
-    (0..(@list.length - 3)).each{|i|
-      sliding << @list[i] + @list[i + 1] + @list[i + 2]
+    @list = (0..(@list.length - 3)).map{|i|
+      @list[i] + @list[i + 1] + @list[i + 2]
     }
-    @list = sliding
     run
   end
 end
