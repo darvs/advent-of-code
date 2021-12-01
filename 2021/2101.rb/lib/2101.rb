@@ -11,17 +11,8 @@ class Depths
       .map(&:strip).map(&:to_i))
   end
 
-  def run
-    @list = (0..(@list.length - 2)).map{|i|
-      x, y = @list[i, 2]
-      y > x ? 1 : 0
-    }.sum
-  end
-
-  def sliding
-    @list = (0..(@list.length - 3)).map{|i|
-      @list[i, 3].sum
-    }
-    run
+  def run_with_sliding_size(sliding_size)
+    chunks = (0..(@list.length - sliding_size)).map{|i| @list[i, sliding_size].sum}
+    (0..(chunks.length - 2)).map{|i| chunks[i, 2]}.filter{|x, y| y > x}.count
   end
 end
