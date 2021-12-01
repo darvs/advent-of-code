@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Expense report
+# Depths
 class Depths
   def initialize(list)
     @list = list
@@ -12,18 +12,15 @@ class Depths
   end
 
   def run
-    increases = 0
-    prev = @list.first
-    @list[1..].map{|current|
-      increases = current > prev ? 1 : 0
-      prev = current
-      increases
+    @list = (0..(@list.length - 2)).map{|i|
+      x, y = @list[i, 2]
+      y > x ? 1 : 0
     }.sum
   end
 
   def sliding
     @list = (0..(@list.length - 3)).map{|i|
-      @list[i] + @list[i + 1] + @list[i + 2]
+      @list[i, 3].sum
     }
     run
   end
