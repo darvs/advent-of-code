@@ -5,5 +5,9 @@ Given(/^the numbers in file "([^"]*)"$/) do |arg1|
 end
 
 Then(/^the power consumption of the submarine is (\d+)$/) do |arg1|
-  expect(@diag.run).to eq(arg1)
+  expect(@diag.run_part1).to eq(arg1)
+end
+
+Then(/^the life support rating of the submarine is (\d+)$/) do |arg1|
+  expect(@diag.run_part2).to eq(arg1)
 end
