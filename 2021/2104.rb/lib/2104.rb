@@ -2,13 +2,12 @@
 
 # Binary Diagnostic
 class SquidGame
-  attr_accessor :winning_card, :turn, :numbers_drawn
+  attr_accessor :winning_card, :last_winning_turn, :numbers_drawn
 
   def initialize(list)
     @numbers_drawn = list[0].strip.split(',').map(&:to_i)
 
     @cards = []
-    @turn = 0
     @last_winning_turn = nil
     @winning_cards = []
 
@@ -39,36 +38,35 @@ class SquidGame
   end
 
   def play
-    (0..(@cards.length - 1)).each{|n|
-      unless @winning_cards.include? n
-        if check_card(n)
-          #p "Winning card #{n} at turn #{@turn} play to win? #{@play_to_win}"
-          @winning_cards += [n]
-          @last_winning_turn = @turn
-          break if @play_to_win
-        end
-      end
+    (0..(@numbers_drawn.length - 1)).each{|turn|
+      @cards.each_with_index{|card, card_index|
+        next if @winning_cards.include? card_index
+
+        next unless check_card(card, @numbers_drawn[0..turn])
+
+        #p "Winning card #{n} at turn #{turn} play to win? #{@play_to_win}"
+        @winning_cards += [card_index]
+        @last_winning_turn = turn
+        break if @play_to_win
+      }
+
+      break if @play_to_win && (@last_winning_turn == turn)
     }
-
-    return if @play_to_win && (@last_winning_turn == @turn)
-
-    @turn += 1
-    play unless @turn == @numbers_drawn.length
   end
 
-  def check_card(n)
+  def check_card(card, numbers)
     #p "Check card #{n} turn #{@turn} drawn #{@numbers_drawn[0..@turn]} card #{@cards[n]}"
-    @cards[n].any?{|line| line.all?{|num| @numbers_drawn[0..@turn].include? num}} or
-      @cards[n].transpose.any?{|column| column.all?{|num| @numbers_drawn[0..@turn].include? num}}
+    card.any?{|line| line.all?{|mine| numbers.include? mine}} or
+      card.transpose.any?{|column| column.all?{|mine| numbers.include? mine}}
   end
 
   def unmarked
-    p ["unmarked card #{@winning_cards[-1]} turn #{@last_winning_turn}"]
+    #p ["unmarked card #{@winning_cards[-1]} turn #{@last_winning_turn}"]
     @cards[@winning_cards[-1]].flatten.reject{|num| @numbers_drawn[0..@last_winning_turn].include? num}.reduce(&:+)
   end
 
   def formula
-    p ["unmarked: #{unmarked} winning_turn #{@last_winning_turn}"]
+    #p ["unmarked: #{unmarked} winning_turn #{@last_winning_turn}"]
     unmarked * @numbers_drawn[@last_winning_turn]
   end
 end

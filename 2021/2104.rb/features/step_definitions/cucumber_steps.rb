@@ -13,7 +13,7 @@ Given('we play to lose') do
 end
 
 Then('the winning number is {int}') do |int|
-  expect(@squid_game.numbers_drawn[@squid_game.turn]).to eq(int)
+  expect(@squid_game.numbers_drawn[@squid_game.last_winning_turn]).to eq(int)
 end
 
 Then('the sum of unmarked squares is {int}') do |arg1|
