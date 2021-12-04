@@ -1,6 +1,6 @@
-Feature: Giant Squid 
+Feature: Squid Game 
 
-	Let's play Squid Bingo
+	Let's play Squid Game
 
 	Scenario: Part 1 small sample
 		Given the numbers in file "2104.smol.in"

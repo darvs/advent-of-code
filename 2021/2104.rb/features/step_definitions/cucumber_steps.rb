@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Given(/^the numbers in file "([^"]*)"$/) do |arg1|
-  @squid_game = SquidBingo.from_file(arg1)
+  @squid_game = SquidGame.from_file(arg1)
 end
 
 Given('we play to win') do
