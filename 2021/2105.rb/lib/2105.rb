@@ -20,12 +20,36 @@ class HydrothermalVenture
     [[data[1].to_i, data[2].to_i], [data[3].to_i, data[4].to_i]]
   end
 
+  #def all_points_for_line(a, b)
+    #ax, ay = a
+    #bx, by = b
+
+    #ay == by ? horizontal_line_points(a, b) : vertical_line_points(a, b)
+  #end
+
   def all_points_for_line(a, b)
     ax, ay = a
     bx, by = b
 
-    ay == by ? horizontal_line_points(a, b) : vertical_line_points(a, b)
+    extent = [(bx - ax).abs, (by - ay).abs].max
+
+    dx = bx <=> ax
+    dy = by <=> ay
+
+    ptt = (0..extent).each_with_object([]){|n, points|
+      #p "w"
+      x = ax + n * dx
+      y = ay + n * dy
+      #p ["x is #{n} and y is #{y}"]
+      points << ["#{x},#{y}"]
+    }
+
+    p ptt
   end
+
+
+
+
 
   def horizontal_line_points(a, b)
     ax, y = a
