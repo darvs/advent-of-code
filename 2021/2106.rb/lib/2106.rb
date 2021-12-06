@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-# frozen_string_literal: true
-
 # Lanternfish
 class Lanternfish
   def initialize(input)
     @list = input
-    @fish = 0
+    @fish = Hash.new(0)
   end
 
   def self.from_file(filename)
@@ -14,17 +12,28 @@ class Lanternfish
   end
 
   def run(days)
-    @list.each{|countdown| fish(days - countdown - 1, 0)}
-    @fish
-  end
+    # Initial fish giving birth
 
-  def fish(countdown, delay)
-    @fish += 1
-    countdown -= delay
+    @list.each{|f|
+      d = f + 1
 
-    while countdown >= 0
-      countdown -= 7
-      fish(countdown, 2)
-    end
+      while d <= days
+        @fish[d] += 1
+        d += 7
+      end
+    }
+
+    # Every fish born during the simulation
+
+    (0..days).each{|birth|
+      d = birth + 9
+
+      while d <= days
+        @fish[d] += @fish[birth]
+        d += 7
+      end
+    }
+
+    @list.count + @fish.map{|_, v| v}.sum
   end
 end
