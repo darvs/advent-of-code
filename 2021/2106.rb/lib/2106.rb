@@ -6,6 +6,7 @@
 class Lanternfish
   def initialize(input)
     @list = input
+    @fish = 0
   end
 
   def self.from_file(filename)
@@ -13,14 +14,17 @@ class Lanternfish
   end
 
   def run(days)
-    (1..days).each{
-      #p @list
-      births = @list.filter(&:zero?).count
-      #p "births = #{births}"
-      @list = [@list.map{|countdown| countdown.zero? ? 6 : countdown - 1}, births.times.map{8}].flatten
-      #p "-> #{@list}"
-    }
+    @list.each{|countdown| fish(days - countdown - 1, 0)}
+    @fish
+  end
 
-    @list.count
+  def fish(countdown, delay)
+    @fish += 1
+    countdown -= delay
+
+    while countdown >= 0
+      countdown -= 7
+      fish(countdown, 2)
+    end
   end
 end
