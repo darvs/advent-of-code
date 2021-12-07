@@ -16,23 +16,11 @@ class TreacheryOfWhales
   end
 
   def run
-    @crab ? run_crabful : run_crabless
-  end
-
-  def run_crabless
-    (@list.min .. @list.max).map{|n|
-      @list.map{|v|
-        [n, (v - n).abs]
-      }.each_with_object(Hash.new(0)){|p, h| h[p[0]] += p[1]}.map{|k,v| v}.flatten
-    }.flatten.min
-  end
-
-  def run_crabful
-    (@list.min .. @list.max).map{|n|
+    p (@list.min..@list.max).map{|n|
       @list.map{|v|
         distance = (v - n).abs
-        [n, (0..distance).sum]
-      }.each_with_object(Hash.new(0)){|p, h| h[p[0]] += p[1]}.map{|k,v| v}.flatten
+        @crab ? [n, (0..distance).sum] : [n, distance]
+      }.each_with_object(Hash.new(0)){|p, h| h[p[0]] += p[1]}.map{|_, v| v}.flatten
     }.flatten.min
   end
 end
