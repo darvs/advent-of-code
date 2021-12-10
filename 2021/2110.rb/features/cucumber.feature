@@ -6,9 +6,9 @@ Feature: Syntax Scoring
 		Given the lines in file "2110.smol.in"
 		Then the syntax score would be 26397
 
-	#Scenario: Part 1 whole enchilada
-		#Given the lines in file "2110.in"
-		#Then the syntax score would be 0
+	Scenario: Part 1 whole enchilada
+		Given the lines in file "2110.in"
+		Then the syntax score would be 389589
 
 	Scenario: Part 2 small sample
 		Given the lines in file "2110.smol.in"
@@ -16,7 +16,7 @@ Feature: Syntax Scoring
 
 	Scenario: Part 2 whole enchilada
 		Given the lines in file "2110.in"
-		Then the auto-complete score would be 0
+		Then the auto-complete score would be 1190420163
 
 
 

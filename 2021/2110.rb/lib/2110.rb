@@ -5,9 +5,8 @@ class Syntax
   OPENERS = ['(', '[', '{', '<'].freeze
   CLOSERS = [')', ']', '}', '>'].freeze
 
-  ERROR_POINTS = { ')' => 3, ']' => 57, '}' => 1197, '>' => 25137 }.freeze
+  ERROR_POINTS = { ')' => 3, ']' => 57, '}' => 1197, '>' => 25_137 }.freeze
   AUTO_COMPLETE_POINTS = { ')' => 1, ']' => 2, '}' => 3, '>' => 4 }.freeze
-
 
   def initialize(input)
     @list = input
@@ -22,39 +21,27 @@ class Syntax
   end
 
   def auto_complete
-    answer = @list.map{|line| parse(line)}.select{|x| x.is_a?(Array)}.map{|answer|
-      p "answer #{answer}"
-      answer.inject(0){|v, x|
-      p "v #{v}, x is #{x} worth #{AUTO_COMPLETE_POINTS[x]}"
-      v = (5 * v + AUTO_COMPLETE_POINTS[x])
-      p v
-    }}.sort
+    scores = @list.map{|line| parse(line)}.select{|x| x.is_a?(Array)}.map{|answer|
+      answer.inject(0){|v, x| 5 * v + AUTO_COMPLETE_POINTS[x]}
+    }.sort
 
-    answer[(answer.length + 1) / 2 - 1]
+    scores[(scores.length + 1) / 2 - 1]
   end
 
   def parse(line, stack = [])
-    return stack.map{|c| corresponding(c)}.reverse if line.empty?
+    return stack.reverse if line.empty? # Incomplete line
 
     head = line.pop
     if OPENERS.include?(head)
-      p "push #{head}"
-      stack.push(head)
-    elsif head != corresponding(stack.pop)
-      p "wrong #{head}"
-      return head
+      stack.push(corresponding(head))
+    elsif head != stack.pop
+      return head # Syntax Error
     end
-
-    p "passed #{line}"
 
     parse(line, stack)
   end
 
   def corresponding(c)
-    return false if c.empty?
-
-    p "corrsponding #{c}"
-
     CLOSERS[OPENERS.find_index(c)]
   end
 end
