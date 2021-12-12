@@ -7,7 +7,7 @@ class Cave
   def initialize(input)
     @visit_a_small_cave_twice = false
 
-    p @map = input.map{|line| line.split('-')}.each_with_object(Hash.new([])){|pair, map|
+    @map = input.map{|line| line.split('-')}.each_with_object(Hash.new([])){|pair, map|
       x, y = pair
       #p "pair #{pair} x #{x} y #{y} map #{map}"
       map[x] += [y]
@@ -21,19 +21,14 @@ class Cave
   end
 
   def number_of_paths
-    @paths = paths
-    p "paths #{@paths}"
-    @paths.length
+    paths.length
   end
 
   def paths(current = 'start', acc = [])
     return (acc + ['end']).join('-') if current == 'end'
 
-    p "paths #{current} #{acc}"
-
     acc += [current]
     @map[current].filter{|v|
-      p "check #{v}, acc #{acc}"
       valid?(v, acc)
     }.each_with_object([]){|v, list|
       list << paths(v, acc.dup)
@@ -53,11 +48,8 @@ class Cave
     return true unless acc.include?(v) # We haven't see this cave before
     return false if v == 'start' && acc.length > 1 # start can't be there twice
 
-    hhh = acc.filter{|w| w.upcase != w}.each_with_object(Hash.new(0)){|x, h|
+    acc.filter{|w| w.upcase != w}.each_with_object(Hash.new(0)){|x, h|
       h[x] += 1
-    }
-
-    p "hhh #{hhh}"
-    hhh.filter{|_, val| val == 2}.empty?
+    }.filter{|_, val| val == 2}.empty?
   end
 end
