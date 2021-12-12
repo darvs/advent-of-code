@@ -25,6 +25,6 @@ Then('there are {int} glowies') do |arg1|
 end
 
 Then('they all sync at step {int}') do |arg1|
-     @octopi.step(0, true)
-     expect(@octopi.all_sync_at).to eq(arg1)
+  @octopi.step(0, true)
+  expect(@octopi.all_sync).to eq(arg1)
 end
