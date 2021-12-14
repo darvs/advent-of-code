@@ -35,9 +35,7 @@ Feature: Extended Polymerization
 		And after 40 steps
 		Then the difference in count is 2188189693529
 
-	Scenario: Part 2 small counts
+	Scenario: Part 2 whole count
 		Given the rules in file "2114.in"
 		And after 40 steps
-		Then the difference in count is 0
-
-
+		Then the difference in count is 3152788426516

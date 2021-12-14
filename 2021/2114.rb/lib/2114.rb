@@ -3,9 +3,9 @@
 # ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn
 class Polymer
   def initialize(input)
-    #p "input #{input}"
     @str = input[0].chars
     @pairs = []
+    @polymer = Hash.new(0)
 
     @rules = input[1..].sort.each_with_object(Hash.new({})){|s, h|
       m = s.match(/([A-Z])([A-Z]) -> ([A-Z])/)
@@ -13,8 +13,7 @@ class Polymer
       h[1][[m[1], m[2]]] = { m[3] => 1 }
     }
 
-    p "pairs #{@pairs}"
-    p "rules init #{@rules[1]}"
+    #p "pairs #{@pairs}"
   end
 
   def self.from_file(filename)
@@ -22,60 +21,42 @@ class Polymer
   end
 
   def run(steps)
-    #p 'run begin'
-    make_rules(steps)
+    make_rules(steps) # Pre-compute the rules
 
-    #init_hash = Hash.new(0)
-    #@str.each{|c| init_hash[c] += 1}
+    @polymer = @str.each_cons(2).map{|sub|
+      @rules[steps][sub]
+    }.each_with_object(Hash.new(0)){|amap, hash| amap.each{|k, v| hash[k] += v}}
 
-    @polymer = solve(@str, steps)
-    
-    # Add the initial string
-    @str.each{|c| @polymer[0][c] += 1}
+    @str.each{|c| @polymer[c] += 1}
 
-
-    #p "run #{@polymer}"
     self
   end
 
-  def solve(list, steps)
-    #p "solve #{steps} #{list}"
-    inserts = (0..(list.length - 2)).map{|i|
-      @rules[steps][[list[i], list[i + 1]]]
-    }
-    p "list #{list} inserts #{inserts}"
-    #list.zip(inserts).flatten.reject(&:nil?).reduce(&:+).chars
-    sol = Hash.new(0)
-    inserts.each{|ins| ins.each{|k, v| sol[k] += v}}
-
-    [sol]
-  end
-
+  # If n is number of steps and A, B and X symbols:
+  # If    the starting string is AB
+  # and   F(1, A, B) = X
+  # then  After 1 step, the string is AXB
+  # then  F(2, A, B) = A + F(1, A, X) + X + F(1, X, B) + B
+  # and   F(n+1, A, B) = A + F(n, A, X) + X + F(n, X, B) + B
   def make_rules(steps)
-    return if steps == 1
+    return if steps == 1 # First step is already defined
 
     (2..steps).each{|n|
       @rules[n] = {}
-      p "make rules #{n} #{Time.new}"
 
-      @pairs.each{|x, y|
-        center = solve([x, y], 1)[0].keys[0] #.reduce(&:+)[1..-2]
-        first = @rules[n - 1][[x, center]]
-        last = @rules[n - 1][[center, y]]
+      @pairs.each{|a, b|
+        center = @rules[1][[a, b]]
+        x = center.keys[0]
+        first = @rules[n - 1][[a, x]]
+        last = @rules[n - 1][[x, b]]
 
-        p "first #{first} center #{center} last #{last}"
-
-        big_hash = Hash.new(0)
-        first.each{|k, v| big_hash[k] += v}
-        p "center #{center} big_hash #{big_hash}"
-        big_hash[center] += 1
-        last.each{|k, v| big_hash[k] += v}
-
-        @rules[n][[x, y]] = big_hash
+        @rules[n][[a, b]] = [first, center, last].each_with_object(Hash.new(0)){|amap, h|
+          amap.each{|k, v| h[k] += v}
+        }
       }
     }
 
-    print_rules(steps)
+    #print_rules(steps)
   end
 
   def print_rules(steps)
@@ -89,18 +70,8 @@ class Polymer
     }
   end
 
-  def to_s
-    @polymer.reduce(&:+)
-  end
-
   def most_common_minus_least_common
-
-    p "the final polymer #{@polymer}"
-    #counts = @polymer.each_with_object(Hash.new(0)){|l, h| h[l] += 1}
-    count_list = @polymer[0].map{|_, v| v}
-
-    p "count_list #{count_list}"
-
+    count_list = @polymer.map{|_, v| v}
     count_list.max - count_list.min
   end
 end
