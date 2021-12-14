@@ -30,9 +30,9 @@ Feature: Extended Polymerization
 		And after 10 steps
 		Then the difference in count is 3095
 
-	#Scenario: Part 2 small counts
-		#Given the rules in file "2114.smol.in"
-		#And after 40 steps
-		#Then the difference in count is 2188189693529
+	Scenario: Part 2 small counts
+		Given the rules in file "2114.smol.in"
+		And after 40 steps
+		Then the difference in count is 2188189693529
 
 
