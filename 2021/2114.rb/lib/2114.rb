@@ -4,13 +4,16 @@
 class Polymer
   def initialize(input)
     #p "input #{input}"
-    @polymer = input[0].chars
+    @str = input[0].chars
+    @pairs = []
 
     @rules = input[1..].sort.each_with_object(Hash.new({})){|s, h|
       m = s.match(/([A-Z])([A-Z]) -> ([A-Z])/)
-      h[1][[m[1], m[2]]] = m[3]
+      @pairs += [[m[1], m[2]]]
+      h[1][[m[1], m[2]]] = { m[3] => 1 }
     }
 
+    p "pairs #{@pairs}"
     p "rules init #{@rules[1]}"
   end
 
@@ -19,21 +22,33 @@ class Polymer
   end
 
   def run(steps)
-    p "run begin"
+    #p 'run begin'
     make_rules(steps)
 
-    @polymer = solve(@polymer, steps)
+    #init_hash = Hash.new(0)
+    #@str.each{|c| init_hash[c] += 1}
+
+    @polymer = solve(@str, steps)
+    
+    # Add the initial string
+    @str.each{|c| @polymer[0][c] += 1}
+
 
     #p "run #{@polymer}"
     self
   end
 
   def solve(list, steps)
-    p "solve #{steps} #{list}"
+    #p "solve #{steps} #{list}"
     inserts = (0..(list.length - 2)).map{|i|
       @rules[steps][[list[i], list[i + 1]]]
     }
-    list.zip(inserts).flatten.reject(&:nil?).reduce(&:+).chars
+    p "list #{list} inserts #{inserts}"
+    #list.zip(inserts).flatten.reject(&:nil?).reduce(&:+).chars
+    sol = Hash.new(0)
+    inserts.each{|ins| ins.each{|k, v| sol[k] += v}}
+
+    [sol]
   end
 
   def make_rules(steps)
@@ -43,14 +58,20 @@ class Polymer
       @rules[n] = {}
       p "make rules #{n} #{Time.new}"
 
-      old_rules = @rules[n - 1].dup
+      @pairs.each{|x, y|
+        center = solve([x, y], 1)[0].keys[0] #.reduce(&:+)[1..-2]
+        first = @rules[n - 1][[x, center]]
+        last = @rules[n - 1][[center, y]]
 
-      old_rules.each{|list, result|
-        x, y = list
-        new_list = [x, result.chars, y].flatten
-        sol = solve(new_list, 1).reduce(&:+)[1..-2]
-        @rules[n][[x, y]] = sol
-        #@rules[1][new_list] = sol.dup
+        p "first #{first} center #{center} last #{last}"
+
+        big_hash = Hash.new(0)
+        first.each{|k, v| big_hash[k] += v}
+        p "center #{center} big_hash #{big_hash}"
+        big_hash[center] += 1
+        last.each{|k, v| big_hash[k] += v}
+
+        @rules[n][[x, y]] = big_hash
       }
     }
 
@@ -73,8 +94,12 @@ class Polymer
   end
 
   def most_common_minus_least_common
-    counts = @polymer.each_with_object(Hash.new(0)){|l, h| h[l] += 1}
-    count_list = counts.map{|_, v| v}
+
+    p "the final polymer #{@polymer}"
+    #counts = @polymer.each_with_object(Hash.new(0)){|l, h| h[l] += 1}
+    count_list = @polymer[0].map{|_, v| v}
+
+    p "count_list #{count_list}"
 
     count_list.max - count_list.min
   end
