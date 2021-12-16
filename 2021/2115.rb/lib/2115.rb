@@ -1,0 +1,190 @@
+# frozen_string_literal: true
+
+# ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn
+class Pos
+  attr_reader :value, :x, :y
+  attr_accessor :risk
+
+  def initialize(pos, value)
+    @x, @y = pos
+    @value = value
+
+    @risk = nil
+  end
+
+  def manhattan_distance
+    @x + @y
+  end
+
+  def to_s
+    "[#{@x},#{@y}] d(#{"%03d" % manhattan_distance}) = #{@value} r(#{@risk.nil? ? '???' : "%03d" % @risk})"
+  end
+
+  def pos
+    [@x, @y]
+  end
+
+  def ==(other)
+    @x == other.x && @y == other.y
+  end
+end
+
+# ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn
+class ChitonMap
+  def initialize(input)
+    @pos = input.each_with_object({}).with_index{|(line, h), y|
+      line.each_with_index{|v, x|
+        h[[x, y]] = Pos.new([x, y], v)
+      }
+    }
+
+    @max_x = @pos.map{|_, v| v.x}.max
+    @max_y = @pos.map{|_, v| v.y}.max
+
+    # get max manhattan_distance
+    @max_man_dist = @pos.map{|_, v| v.manhattan_distance}.max
+    p "Maximum manhattan distance: #{@max_man_dist}"
+
+
+    # top left corner
+    @pos.filter{|_, pt| pt.manhattan_distance.zero?}.each{|_, pt| pt.risk = 0}
+
+    # adjacent points
+    @pos.filter{|_, pt| pt.manhattan_distance == 1}.each{|_, pt| pt.risk = pt.value}
+
+    (2..6).each{|dist|
+      p "dist"
+      @pos.filter{|k, pt| pt.manhattan_distance == dist}.each{|k, pt|
+        x2, y2 = pt.pos
+
+        # the base risk might not be the minimum, but it's the risk
+        # based on a close distance. It will give us an idea if we're
+        # wandering too far away.
+        p "base_risk for pt.value #{pt.value} | #{x2},#{y2} : #{(x2.zero? ? [x2, y2 - 1] : [x2 - 1, y2])}"
+        base_risk = pt.value + (x2.zero? ? @pos[[x2, y2 - 1]].risk : @pos[[x2 - 1, y2]].risk)
+        p "check #{x2},#{y2} #{base_risk}"
+
+        all_paths_under_base_risk(pt, base_risk)
+      }
+    }
+
+    # print the positions
+    @pos.sort_by{|_, pt| pt.manhattan_distance}.each{|_, p| p p.to_s}
+  end
+
+  def self.from_file(filename)
+    new(File.readlines(File.join('data', filename)).map(&:strip).reject(&:empty?).map{|line| line.chars.map(&:to_i)})
+  end
+
+  def total_risk
+    #next_column_neighbors([0, 0])
+    0
+  end
+
+  def next_column_neighbors(pt)
+    p "next_column_neighbors"
+    x1, y1 = pt
+    next_column = @pos.filter{|k, _|
+      x2, = k
+      x2 == x1 + 1
+    }
+    next_column.map{|_, v| v}.each{|p2|
+      x2, y2 = p2.pos
+      p "X2 #{x2}"
+      path = shortest_path(x1, y1, x2, y2)
+      p "#{pt} -> #{p2.pos} : #{path}"
+    }
+  end
+
+  def shortest_path(x1, y1, x2, y2, path = [])
+    return path << [x1, y1] if x2 == x1 && y2 == y1
+
+    #p "shortest_path #{x1},#{y1} -> #{x2},#{y2} #{path}"
+
+    path << [x1, y1]
+
+    if x2 == x1
+      if y2 > y1
+        shortest_path(x1, y1 + 1, x2, y2, path)
+      else
+        shortest_path(x1, y1 - 1, x2, y2, path)
+      end
+    elsif x2 > x1
+      shortest_path(x1 + 1, y1, x2, y2, path)
+    else
+      shortest_path(x1 - 1, y1, x2, y2, path)
+    end
+  end
+
+  def all_paths_under_base_risk(pt, base_risk)
+    p "all_paths #{pt} under base_risk #{base_risk}"
+    #pt.risk = pt.value + 
+    sub_risk = @pos.filter{|k, p0| p0.manhattan_distance == pt.manhattan_distance - 1}
+        .map{|_, p0| p0}
+        .each{|p0| path_between(p0, pt, base_risk)}
+        #.reject(&:empty?)
+        #.map{|list| risk_list(list)}
+        #.min
+
+    #p "sub_risk #{sub_risk}"
+    #p "sr2 #{sub_risk.flatten(4)}"
+
+    #pt.risk = sub_risk + pt.value
+    #pt.risk = 9
+  end
+
+  def risk_list(list)
+    head, *rest = list
+    #head = head.flatten(1)
+    p "list #{list} head #{head} rest #{rest}"
+    p "@pos[head] #{@pos[head]}"
+    @pos[head].risk + rest.map{|coord|
+      #p "coord #{coord}"
+      #p "value #{@pos[coord]}"
+      @pos[coord].value
+    }.sum
+  end
+
+
+  def path_between(p0, pt, base_risk, risk = 0, path = [])
+    if p0 == pt
+      p "p0 == pt #{p0.pos} path:#{path}"
+      head, *tail = path
+      p "head #{head} tail #{tail}"
+      p "@pos[head].risk #{@pos[head].risk}"
+      sub_risk = @pos[head].risk + tail.map{|coord| @pos[coord].value}.sum
+      p "sub_risk #{sub_risk}"
+      p "pt.value #{pt.value}"
+      pt.risk = pt.risk.nil? ? (pt.value + sub_risk) : [pt.risk, (pt.value + sub_risk)].min
+      #pt.risk += pt.value
+    end
+    return path if p0 == pt
+
+    #p "path_between #{p0} and #{pt}"
+    all_valid_directions(p0, path.dup).map{|coord| @pos[coord]}.filter{|p1|
+      #p "p1.value #{p1.value} <= #{base_risk} brisk ? #{p1.value <= base_risk}"
+      risk + p1.value <= base_risk
+    }.map{|p1|
+      pb = path_between(p1, pt, base_risk, risk + p1.value, path.dup << p0.pos)
+      #p ["pb #{pb}"]
+      #pb
+    }
+    return []
+  end
+
+  def all_valid_directions(p0, path)
+    [[1, 0], [0, 1], [0, -1], [-1, 0]].map{|dx, dy|
+      [p0.x + dx, p0.y + dy]
+    }.filter{|x, y|
+      #p "x is #{x} y is #{y}"
+      valid_point(x, y, path)
+    }
+  end
+
+  def valid_point(x, y, path)
+    return false unless x.between?(0, @max_x)
+    return false unless y.between?(0, @max_y)
+
+    !path.include?([x, y])
+  end
+end
