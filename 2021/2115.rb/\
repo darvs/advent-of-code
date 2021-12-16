@@ -51,8 +51,6 @@ class ChitonMap
     # adjacent points
     @pos.filter{|_, pt| pt.manhattan_distance == 1}.each{|_, pt| pt.risk = pt.value}
 
-    @valid_coord = Hash.new{[]}
-
     (2..@max_man_dist).each{|dist|
       p "dist"
       @pos.filter{|k, pt| pt.manhattan_distance == dist}.each{|k, pt|
@@ -61,15 +59,8 @@ class ChitonMap
         # the base risk might not be the minimum, but it's the risk
         # based on a close distance. It will give us an idea if we're
         # wandering too far away.
-        #p "base_risk for pt.value #{pt.value} | #{x2},#{y2} : #{(x2.zero? ? [x2, y2 - 1] : [x2 - 1, y2])}"
-        #base_risk = pt.value + ((x2.zero? || y2.zero?) ? (x2.zero? ? ) : [@pos[[x2, y2 - 1]].risk, @pos[[x2 - 1, y2]].risk].min)
-
-        base_risk = pt.value + if x2.zero? || y2.zero?
-                                 x2.zero? ? @pos[[x2, y2 - 1]].risk : @pos[[x2 - 1, y2]].risk
-                               else
-                                 [@pos[[x2, y2 - 1]].risk, @pos[[x2 - 1, y2]].risk].min
-                               end
-
+        p "base_risk for pt.value #{pt.value} | #{x2},#{y2} : #{(x2.zero? ? [x2, y2 - 1] : [x2 - 1, y2])}"
+        base_risk = pt.value + (x2.zero? ? @pos[[x2, y2 - 1]].risk : @pos[[x2 - 1, y2]].risk)
         p "check #{x2},#{y2} #{base_risk}"
 
         pt.risk = base_risk
@@ -129,8 +120,7 @@ class ChitonMap
   def all_paths_under_base_risk(pt)
     p "all_paths #{pt} under #{pt.risk}"
     #pt.risk = pt.value + 
-    #sub_risk = @pos.filter{|k, p0| p0.manhattan_distance == pt.manhattan_distance - 1}
-    sub_risk = @pos.reject{|_, p0| (p0.risk).nil? || p0 == pt}
+    sub_risk = @pos.filter{|k, p0| p0.manhattan_distance == pt.manhattan_distance - 1}
         .map{|_, p0| p0}
         .each{|p0| path_between(p0, pt, p0.risk)}
         #.reject(&:empty?)
@@ -159,7 +149,7 @@ class ChitonMap
 
   def path_between(p0, pt, risk = 0, path = [])
     if p0 == pt
-      p "/#{p0.x + p0.y}/ p0 == pt #{p0.pos} path:#{path}"
+      p "p0 == pt #{p0.pos} path:#{path}"
       head, *tail = path
       p "head #{head} tail #{tail}"
       #p "@pos[head].risk #{@pos[head].risk}"
@@ -170,9 +160,8 @@ class ChitonMap
       p "pt.risk #{pt.risk} risk #{risk}"
       pt.risk = pt.risk.nil? ? risk : [pt.risk, risk].min
       #pt.risk += pt.value
-
-      return path
     end
+    return path if p0 == pt
 
     #p "path_between #{p0} and #{pt}"
     all_valid_directions(p0, path.to_set).map{|coord| @pos[coord]}.filter{|p1|
@@ -180,7 +169,7 @@ class ChitonMap
       new_value = risk + p1.value
       ((new_value <= pt.risk - pt.value) &&
       (p1.risk.nil? || new_value <= p1.risk)) ||
-        (p1 == pt)
+      (p1 == pt)
     }.map{|p1|
       path_between(p1, pt, risk + p1.value, path.dup << p0.pos)
     }
@@ -188,32 +177,18 @@ class ChitonMap
   end
 
   def all_valid_directions(p0, path)
-    v = @valid_coord[p0]
-    unless v.empty?
-      return v.filter{|pt|
-        x, y = pt
-        !path.include?([x, y])
-      }
-    end
-
-    p "check directions #{p0}"
-    
-    @valid_coord[p0] =
-      [[1, 0], [0, 1], [0, -1], [-1, 0]].map{|dx, dy|
-        [p0.x + dx, p0.y + dy]
-      }.filter{|x, y|
-        y.between?(0, @max_y) && x.between?(0, @max_x)
-      }
-
-    all_valid_directions(p0, path)
-
-    #}.filter{|x, y|
-      ##p "x is #{x} y is #{y}"
-      #valid_point(x, y, path)
-    #}
+    [[1, 0], [0, 1], [0, -1], [-1, 0]].map{|dx, dy|
+      [p0.x + dx, p0.y + dy]
+    }.filter{|x, y|
+      #p "x is #{x} y is #{y}"
+      valid_point(x, y, path)
+    }
   end
 
-  #def valid_point(x, y, path)
-    #!path.include?([x, y])
-  #end
+  def valid_point(x, y, path)
+    return false unless x.between?(0, @max_x)
+    return false unless y.between?(0, @max_y)
+
+    !path.include?([x, y])
+  end
 end
