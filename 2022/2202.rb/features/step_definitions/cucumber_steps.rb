@@ -19,3 +19,7 @@ end
 Then(/^my total score is (\d+)$/) do |arg1|
   expect(@game.score_part1).to eq(arg1)
 end
+
+Then(/^my total score in part 2 is (\d+)$/) do |arg1|
+  expect(@game.score_part2).to eq(arg1)
+end
