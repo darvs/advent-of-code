@@ -1,0 +1,39 @@
+#!/usr/bin/env zsh
+
+from_template() {
+	[[ -s "${PROJ}"/"${1}" ]] || cp "${TEMPLATE}"/"${2}" "${PROJ}"/"${1}"
+}
+
+
+BASE=$(cd "$(dirname "${0}")" && pwd)
+TEMPLATE=${BASE}/template
+
+[[ -n "${1}" ]] || (( echo "Usage : "${0}" project-name.rb" && exit 1 ))
+
+ARG="${1}"
+SPLIT=("${(@s/./)ARG}") 
+NOEXT="${SPLIT[1]}"
+EXT="${SPLIT[2]}"
+COPY="${2}"
+
+PROJ="${BASE}/${1}"
+
+mkdir -p "${PROJ}"
+mkdir -p "${PROJ}"/lib
+mkdir -p "${PROJ}"/data
+
+cd "${PROJ}"
+cucumber --init
+cd "${BASE}"
+
+from_template "features/cucumber.feature" "cucumber.feature"
+
+from_template "Makefile" "Makefile"
+from_template "features/step_definitions/cucumber_steps.rb" frozen_string_literal.rb
+from_template "lib/${ARG}" frozen_string_literal.rb
+from_template "features/support/env.rb" env.rb
+
+touch "${PROJ}"/data/"${NOEXT}".in
+
+[[ ! -z ${COPY} ]] && cp -Rv "${COPY}/features" "${PROJ}"
+[[ ! -z ${COPY} ]] && cp "${COPY}/lib"/*.rb "${PROJ}/lib/${1}"
