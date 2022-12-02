@@ -16,6 +16,6 @@ Feature: RoShamBo
 
 	Scenario: Part 2
 		Given the moves in file '2202.in'
-		Then my total score in part 2 is 12
+		Then my total score in part 2 is 12989
 
 
