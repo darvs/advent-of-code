@@ -20,10 +20,6 @@ class Rucksack
   end
 
   def sum_priorities3
-    repeats = []
-    @list.each_slice(3){|a, b, c| repeats.append((a.chars.to_set & b.chars.to_set & c.chars.to_set).to_a.map{|c| @alphabet.index(c) + 1}.first)}
-
-    repeats.sum
+    @list.each_slice(3).map{|a, b, c| (a.chars.to_set & b.chars.to_set & c.chars.to_set).to_a.map{|x| @alphabet.index(x) + 1}.first}.sum
   end
-
 end
