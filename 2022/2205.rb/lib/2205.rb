@@ -31,27 +31,24 @@ class Stacks
       .map(&:chomp))
   end
 
-  def run
-    p 'run'
+  def run9000
     @moves.each{|m|
-      p "m #{m}"
       (1..m[0]).each{
         x = @stacks[m[1] - 1].shift
         @stacks[m[2] - 1].unshift(x)
-
-        p "s #{@stacks}"
       }
     }
   end
 
-  def ends_up_as
-    p @stacks
-    p @moves
+  def run9001
+    @moves.each{|m|
+      x = @stacks[m[1] - 1].shift(m[0])
+      @stacks[m[2] - 1].unshift(x).flatten!
+    }
+  end
 
-    run
-
-    p @stacks
-
+  def ends_up_as(mover)
+    mover.eql?(9000) ? run9000 : run9001
     @stacks.map(&:first).reduce(&:+)
   end
 end
