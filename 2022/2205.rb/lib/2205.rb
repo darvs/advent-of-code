@@ -11,13 +11,8 @@ class Stacks
     list.take_while{|x| !x.empty?}
         .map(&:chars)
         .transpose
-        .map(&:reverse)
-        .filter{|x| x.first =~ /\d+/}
-        .map{|x|
-          x.drop(1)
-           .reverse
-           .drop_while{|f| f == ' '}
-        }
+        .map{|l| l.select{|c| ('A'..'Z').include?(c) }}
+        .reject(&:empty?)
   end
 
   def parse_moves(list)
