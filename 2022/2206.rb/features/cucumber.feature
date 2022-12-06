@@ -31,6 +31,6 @@ Feature: Handheld Device
 	Scenario: Part 1
 		Given the string in file '2206.in'
 		And we are looking for a message
-		Then it should start at position 555
+		Then it should start at position 2383
 
 
