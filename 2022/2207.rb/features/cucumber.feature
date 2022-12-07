@@ -8,7 +8,7 @@ Feature: No Space Left on Device
 
 	Scenario: Part 1
 		Given the content of file '2207.in'
-		Then the sum of the size is 42
+		Then the sum of the size is 1644735   
 
 	Scenario: Part 2 smol
 		Given the content of file '2207.smol.in'
@@ -16,4 +16,4 @@ Feature: No Space Left on Device
 
 	Scenario: Part 2
 		Given the content of file '2207.in'
-		Then the minimum space to free is 7
+		Then the minimum space to free is 1300850

@@ -8,26 +8,23 @@ class Shell
     @du = Hash.new(0)
 
     list.each{|line| parse(line)}
-
   end
 
   def parse(str)
-    p str
     case str
-    #when /\$ cd \//
+
     when %r{\$ cd /}
-      #p '  GO ROOT'
       @current_dir = []
+
     when /\$ cd \.\./
-      #p '  GO BACK'
       @current_dir.pop
+
     when /\$ cd (\w+)/
-      #p "  CAUGHT #{::Regexp.last_match(1)}"
       @current_dir.append(::Regexp.last_match(1))
+
     when /(\d+) (\S+)/
       size = ::Regexp.last_match(1).to_i
       file = ::Regexp.last_match(2)
-      #p "  FILE bytes:#{size} name:#{file}"
 
       path_name = Array.new(@current_dir)
 
@@ -39,9 +36,6 @@ class Shell
       end
       @du['/'] += size
 
-      #p @fs
-    else
-      p '  SKIPPIN\''
     end
   end
 
@@ -56,7 +50,7 @@ class Shell
       .map(&:chomp))
   end
 
-  def sum_of_total_sizes
+  def debug
     p 'fs ------------------------'
     @fs.each_key{|k|
       p [dir_name(k), @fs[k]]
@@ -66,15 +60,16 @@ class Shell
     @du.each_key{|k|
       p [k, @du[k]]
     }
+  end
 
+  def sum_of_total_sizes
+    #debug
     @du.each_key.select{|k| @du[k] <= 100_000}.map{|k| @du[k]}.sum
   end
 
   def space_to_free
-    space_needed = 30000000 - ( 70000000 - @du['/'])
-    p "Space needed #{space_needed}"
-
+    #debug
+    space_needed = 30_000_000 - (70_000_000 - @du['/'])
     @du.each_key.select{|k| @du[k] >= space_needed }.map{|k| @du[k]}.min
   end
-
 end
