@@ -26,6 +26,4 @@ Feature: Treetop Tree House
 
 	Scenario: Best scenic score
 		Given the content of file '2208.in'
-		Then the best scenic score is 8
-
-
+		Then the best scenic score is 327180

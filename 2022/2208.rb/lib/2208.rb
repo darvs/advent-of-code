@@ -16,7 +16,6 @@ class Treehouse
         @forest[i][j] = c.to_i
       }
     }
-    p @forest
   end
 
   def self.from_file(filename)
@@ -34,6 +33,7 @@ class Treehouse
     return true if (0..x - 1).map{|xx| @forest[y][xx]}.all?{|other| val > other}
     return true if (x + 1..@len - 1).map{|xx| @forest[y][xx]}.all?{|other| val > other}
     return true if (y + 1..@len - 1).map{|yy| @forest[yy][x]}.all?{|other| val > other}
+
     false
   end
 
@@ -57,15 +57,14 @@ class Treehouse
     return 0 if [0, @len - 1].include?(x)
 
     val = @forest[y][x]
-    p "val is #{val}"
 
     [(0..y - 1).reverse_each.map{|yy| @forest[yy][x]},
      (0..x - 1).reverse_each.map{|xx| @forest[y][xx]},
      (x + 1..@len - 1).map{|xx| @forest[y][xx]},
      (y + 1..@len - 1).map{|yy| @forest[yy][x]}]
       .map{|l|
-        p l
-        [l.take_while{|vv| val > vv}.count + 1, l.length].min}.reduce(&:*)
+        [l.take_while{|vv| val > vv}.count + 1, l.length].min
+      }.reduce(&:*)
   end
 
   # Best Scenery
@@ -76,6 +75,5 @@ class Treehouse
       }
     }.flatten.max
   end
-
 end
 
