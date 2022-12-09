@@ -2,67 +2,85 @@
 
 # Rope Bridge
 class Rope
-  def initialize(list)
+  def initialize(list, number_of_knots)
     @list = list.map(&:split).map{|i, n| [i, n.to_i]}
 
-    @h = [0, 0]
-    @t = [0, 0]
+    #@h = [0, 0]
+    #@t = [0, 0]
+
+    @knots = Array.new(number_of_knots, [0, 0])
+    #p "knots #{@knots}"
 
     @tails = Set.new
-    @tails.add(@t)
+    @tails.add([0, 0])
   end
 
-  def self.from_file(filename)
-    new(File.readlines(File.join('data', filename))
-      .map(&:chomp))
+  def self.from_file(filename, number_of_knots)
+    new(File.readlines(File.join('data', filename)).map(&:chomp), number_of_knots)
   end
 
   def run
     @list.each{|move, n|
       (1..n).each{
+        # ------------------------------------
+        #  First we move the head
+        # ------------------------------------
+
         #p move
-        x, y = @h
+        x, y = @knots[0]
 
         case move
         when 'U'
-          @h = [x, y + 1]
+          y += 1
         when 'D'
-          @h = [x, y - 1]
+          y -= 1
         when 'R'
-          @h = [x + 1, y]
+          x += 1
         when 'L'
-          @h = [x - 1, y]
+          x -= 1
         end
 
-        # new x, y
-        hx, hy = @h
-        tx, ty = @t
-        dx = hx - tx
-        dy = hy - ty
+        @knots[0] = [x, y]
 
-        next if dx.abs <= 1 && dy.abs <= 1
+        # ------------------------------------
+        #  Then all the other knots
+        # ------------------------------------
 
-        #p 'gotta move'
+        (1..@knots.length - 1).each{|i|
+          # new x, y
+          x1, y1 = @knots[i - 1]
+          x2, y2 = @knots[i]
+          dx = x1 - x2
+          dy = y1 - y2
 
-        tx += 1 if dx.positive?
-        tx -= 1 if dx.negative?
-        ty += 1 if dy.positive?
-        ty -= 1 if dy.negative?
+          next if dx.abs <= 1 && dy.abs <= 1
 
-        @t = [tx, ty]
-        @tails.add(@t)
+          #p 'gotta move'
 
+          x2 += 1 if dx.positive?
+          x2 -= 1 if dx.negative?
+          y2 += 1 if dy.positive?
+          y2 -= 1 if dy.negative?
+
+          @knots[i] = [x2, y2]
+        }
+
+        # Note the tail's position
+        @tails.add(@knots[@knots.length - 1])
       }
     }
   end
 
-  def position_count
-    p @list
-    run
+  def debug
+    #p @list
     p "end h #{@h}"
     p "end t #{@t}"
     p "tails #{@tails}"
+  end
 
+  def position_count
+    run
+    #debug
     @tails.length
   end
 end
