@@ -3,9 +3,10 @@
 # A Monkey
 class Monkey
   attr_accessor :items,
-                :new_items
+                :new_items,
+                :divisible
+
   attr_writer :operation,
-              :divisible,
               :if_true,
               :if_false
 
@@ -39,11 +40,11 @@ class Monkey
     end
   end
 
-  def run(worry_divider)
+  def run(worry_divider, lcm)
     #p "RUN Monkey #{@number} -------------------"
     count = @items.length
     @items.each{|i|
-      value = run_op(i) / worry_divider
+      value = (run_op(i) / worry_divider) % lcm
       #target = (value % @divisible).zero? ? @if_true : @if_false
       #p "monkeys #{$monkeys}"
       #p "check #{value} % #{@divisible} ? #{@if_true} : #{@if_false}"
@@ -114,8 +115,12 @@ class Business
 
   def level_of_monkey_business(rounds, worry_divider)
     debug
+
+    lcm = $monkeys.map{|_, m| m.divisible}.reduce(1, :lcm)
+    p "lcm #{lcm}"
+
     rounds.times{|r|
-      $monkeys.each{|_, m| m.run(worry_divider)}
+      $monkeys.each{|_, m| m.run(worry_divider, lcm)}
       #$monkeys.each{|_, m| m.end_turn}
       if (r % 10).zero?
         p '-----------------------------'
