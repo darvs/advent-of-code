@@ -8,4 +8,4 @@ Feature:
 
 	Scenario: Part 1
 	    Given the content of file '2212.in'
-	    Then the shortest path length is 42
+	    Then the shortest path length is 484
