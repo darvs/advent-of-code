@@ -1,16 +1,23 @@
 # frozen_string_literal: true
 
+# A Point on the Map
 class Point
-  attr_reader :height
+  attr_reader :height, :x, :y, :symbol
 
-  def initialize(height)
-    @height = height
-    @distance = nil
+  attr_accessor :manhattan_distance
+
+  def initialize(y, x, symbol)
+    @y = y
+    @x = x
+    @symbol = symbol
+    @height = symbol == 'S' ? 0 : 'abcdefghijklmnopqrstuvwxyzE'.index(symbol)
+    @shortest_path = nil
+    @manhattan_distance = 0
   end
 
-  def check_distance(d)
-    if @distance.nil? || @distance > d
-      @distance = d
+  def is_shortest_path?(d)
+    if @shortest_path.nil? || @shortest_path > d
+      @shortest_path = d
       return true
     end
 
@@ -18,18 +25,49 @@ class Point
   end
 
   def to_s
-    "Point h #{@height} d #{@distance}"
+    #"Point h #{@height} d #{@shortest_path}"
+    "(#{symbol} #{y},#{x}, (md #{@manhattan_distance}))"
+  end
+end
+
+# A Collection of Some Points
+class SomePoints
+  attr_reader :summit, :points
+
+  def initialize
+    @points = Hash.new(nil)
+    @summit = nil
+  end
+
+  def add(y, x, symbol)
+    p = Point.new(y, x, symbol)
+    @points[[y, x]] = p
+
+    if symbol == 'E'
+      p "Summit is #{p}"
+      @summit = p
+      p.manhattan_distance = 0
+    else
+      p.manhattan_distance = (p.x - @summit.x).abs + (p.y - @summit.y).abs
+    end
+  end
+
+  def main_start
+    main = @points.filter{|_, p|
+      p.symbol == 'S'}.map{|_, p| p}.first
+
+    p "main: #{main}"
+    main
   end
 end
 
 # A Singer
 class KateBush
-  HIGH = 'SabcdefghijklmnopqrstuvwxyzE'
-
   def initialize(list)
-    @top = HIGH.index('E')
     @start = []
-    @end = []
+
+    @all = SomePoints.new
+
     #@current = []
     @all_starts = []
 
@@ -39,29 +77,31 @@ class KateBush
     @map_w = list[0].length 
     @map_h = list.length
 
-    @distance = nil
+    @shortest_path = nil
   end
 
   def parse(list)
-    list.each_with_index{|line, y|
-      line.chars.each_with_index{|hi, x|
-        #p "[#{x},#{y}] hi #{hi} li #{line}"
-        if hi == 'S'
-          @start = [y, x]
-          #@current = @start
-          @all_starts.append(@start)
-        end
+    # Mark summit first
 
-        @all_starts.append([y, x]) if hi == 'a'
-
-        @end = [y, x] if hi == 'E'
-
-        pt = Point.new(HIGH.index(hi))
-
-        @map[[y, x]] = pt
-        #p "setmap #{pt} #{@map[[y, x]]}"
+    points = list.each_with_index.map{|line, y|
+      line.chars.each_with_index.map{|sym, x|
+        [y, x, sym]
       }
-    }
+    }.flatten(1)
+
+    #p "points #{points}"
+
+    # First find the summit
+    summit, others = points.partition{|_, _, sym| sym == 'E'}
+
+    # Create the summit
+    summit.map{|y, x, sym| @all.add(y, x, sym)}
+
+    # Create the others
+    others.map{|y, x, sym| @all.add(y, x, sym)}
+
+    #p "all #{@all.points}"
+
   end
 
   def self.from_file(filename)
@@ -77,16 +117,18 @@ class KateBush
     return nil unless x.between?(0, @map_w - 1)
     return nil unless y.between?(0, @map_h - 1)
     #p "x #{x}/#{@map_w} y #{y}"
-    return nil unless @map[[y, x]].height <= h + 1
+    return nil unless @all.points[[y, x]].height <= h + 1
 
     # Do we already have a successful shorter path?
-    return nil if (! @distance.nil?) && (path_set.length >= @distance)
+    return nil if !@shortest_path.nil? && (path_set.length >= @shortest_path)
 
+    # Did we already visit that point?
     return nil if path_set.include?([y, x])
 
-    return nil unless @map[[y, x]].check_distance(path_set.length)
+    # Abandon if we already have a shorter path to this point
+    return nil unless @all.points[[y, x]].is_shortest_path?(path_set.length)
 
-    [y, x]
+    @all.points[[y, x]]
   end
 
   def next_directions(y, x, h, path_set)
@@ -96,42 +138,53 @@ class KateBush
      valid_direction(y, x - 1, h, path_set)]
       .reject(&:nil?)
       .sort{|a, b|
-        #p "sort a #{a} b #{b}"
-        if a.nil? then b
-        elsif b.nil? then a
-        else @map[a].height <=> @map[b].height end
+        h = (b.height <=> a.height)
+        if !h.zero? then h
+        else
+          (a.manhattan_distance <=> b.manhattan_distance)
+        end
       }
+      # .sort{|a, b|
+      #   h = (a.height <=> b.height)
+      #   if h.zero? then (a.manhattan_distance <=> b.manhattan_distance) end
+      #   h
+      # }
   end
 
   def run(current, path)
-    #p "run #{current} , #{path}"
+    # p "run #{current} , #{path}"
     #p "map #{@map}"
-    y, x = current
-    h = @map[[y, x]].height
+    h = current.height
 
-    #return path.prepend(current) if h == @top
-    if h == @top
+    if h == @all.summit.height
       p "Reached the top with path of length #{path.length}"
-      @distance = path.length if @distance.nil? || path.length < @distance
-      return path.length # + 1 for current, -1 removes the origin
+      @shortest_path = path.length if @shortest_path.nil? || path.length < @shortest_path
+      return [path.length] # + 1 for current, -1 removes the origin
     end
 
-    valid_next = next_directions(y, x, h, path.to_set)
+    valid_next = next_directions(current.y, current.x, current.height, path.to_set)
 
-    #return nil if valid_next.empty?
-    return nil if valid_next.empty?
+    return [nil] if valid_next.empty?
 
     #p "v_n #{valid_next}"
 
     valid_next.map{|n|
-      #p "#{current} -> #{n} : #{path.clone.prepend(current)}"
+      #p "#{current} -> #{n} : #{path.clone.prepend([current.y, current.x])}"
       run(n, path.clone.prepend(current))
     } #.reject(&:nil?).reject(&:empty?)
   end
 
   def running_up_that_hill
-    x = run(@start, [])
-    p '---------------------------------------------------------'
-    p x.flatten.reject(&:nil?).min
+    @all.points.filter{|_, v| v.symbol == 'S'}.map{|_, v|
+      p "Running for #{v}..."
+      run(v, []).flatten.reject(&:nil?).min
+    }.min
+  end
+
+  def running_up_all_hills
+    @all.points.filter{|_, v| v.height.zero?}.map{|_, v| v}.sort{|a, b| a.manhattan_distance <=> b.manhattan_distance}.map{|v|
+      p "Running for #{v}..."
+      run(v, []).flatten.reject(&:nil?).min
+    }.reject(&:nil?).min
   end
 end
