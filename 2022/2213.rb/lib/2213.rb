@@ -5,20 +5,22 @@ class DistressSignal
   def initialize(list)
     @list = list.each_slice(2).map{|a, b|
       [a, b].map{|string|
-        eval(string)
-        #parse_packet(string)
+        #eval(string)
+        the_lesser_of_two_evals(string)
       }
     }
     #p @list
   end
 
-  def parse_packet(string)
+  # Formerly known as 'parse_packet', I realized that this
+  # is absolutely useless. But since I wrote it and I was
+  # needlessly proud of it, we're going to keep it.
+  #
+  def the_lesser_of_two_evals(string)
     l = string.chars.drop(1)
 
-    #puts "l #{l}"
-
     parsed = parse_list(l.clone)
-    puts "parsed #{parsed}"
+    #puts "parsed #{parsed}"
 
     parsed
   end
@@ -51,30 +53,6 @@ class DistressSignal
     new(File.readlines(File.join('data', filename)).map(&:chomp).reject(&:empty?))
   end
 
-  # def cmp(left, right)
-  #   puts "cmp #{left} and #{right}"
-  #
-  #   return left < right if left.is_a?(Integer) && right.is_a?(Integer)
-  #
-  #   return cmp([left], right) if left.is_a?(Integer) && right.is_a?(Array)
-  #
-  #   return cmp(left, [right]) if left.is_a?(Array) && right.is_a?(Integer)
-  #
-  #   return true if left.empty?
-  #
-  #   return false if right.empty?
-  #
-  #   l = left.shift
-  #   r = right.shift
-  #
-  #   puts "checkints #{l} #{r}"
-  #   return false if !cmp(l, r)
-  #   puts "reroll #{left} #{right}"
-  #
-  #   cmp(left, right)
-  # end
-  #
-
   def check_type(var)
     var.is_a?(Integer) ? :int : :arr
   end
@@ -90,7 +68,7 @@ class DistressSignal
   #              1 if left >  right
   #
   def cmp(left, right)
-    puts "cmp #{left}, #{right}"
+    #puts "cmp #{left}, #{right}"
 
     return  0 if left.empty? && right.empty?
     return -1 if left.empty?
@@ -110,11 +88,11 @@ class DistressSignal
                   cmp(l, r)
 
                 when %i[int int]
-                  puts "#{l} <=> #{r}"
+                  #puts "#{l} <=> #{r}"
                   l <=> r
                 end
 
-    puts "cmp_first #{cmp_first}"
+    #puts "cmp_first #{cmp_first}"
 
     return -1 if cmp_first == -1
     return 1 if cmp_first == 1
@@ -124,13 +102,15 @@ class DistressSignal
 
   def run
     @list.map{|left, right|
-      c = cmp(left, right)
-      puts "RETURN: #{c}"
+      cmp(left, right)
+    }.map{|c|
+      #puts "RETURN: #{c}"
       c
-    }.each_with_index
-        .map{|r, n| [r, n]}
-        .filter{|r, _| r == -1}
-        .map{|_, n| n + 1}
-        .reduce(&:+)
+    }
+         .each_with_index
+         .map{|r, n| [r, n]}
+         .filter{|r, _| r == -1}
+         .map{|_, n| n + 1}
+         .reduce(&:+)
   end
 end
