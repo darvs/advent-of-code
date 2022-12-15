@@ -4,40 +4,43 @@
 class DistressSignal
   def initialize(list)
     @list = list.each_slice(2).map{|a, b|
-      [a, b].map{|i| parse_packet(i)}
+      [a, b].map{|string|
+        eval(string)
+        #parse_packet(string)
+      }
     }
-    p @list
+    #p @list
   end
 
-  def parse_packet(s)
-    l = s.chars
-         .reject{|c| c == ','}
-         .map{|c| ['[', ']'].include?(c) ? c : c.to_i}
-         .drop(1)
+  def parse_packet(string)
+    l = string.chars.drop(1)
 
     #puts "l #{l}"
 
     parsed = parse_list(l.clone)
     puts "parsed #{parsed}"
 
-    l
+    parsed
   end
 
-  def parse_list(tokens, list=[])
-    #puts "p_l #{tokens} | #{list}"
-    return list if tokens.empty?
-
+  def parse_list(tokens, list = [])
     until tokens.empty?
-      head = tokens.first
-      tokens.shift(1)
+      head = tokens.shift
 
-      if head == '['
+      case head
+      when '['
         list.append(parse_list(tokens))
-      elsif head == ']'
-        #puts "dumping #{list}"
+      when ']'
         return list
+      when ','
+        # do no thing
       else
-        list.append(head)
+        n = ''
+        while '0123456789'.index(head)
+          n += head
+          head = tokens.shift
+        end
+        list.append(n.to_i)
       end
     end
 
@@ -48,7 +51,86 @@ class DistressSignal
     new(File.readlines(File.join('data', filename)).map(&:chomp).reject(&:empty?))
   end
 
+  # def cmp(left, right)
+  #   puts "cmp #{left} and #{right}"
+  #
+  #   return left < right if left.is_a?(Integer) && right.is_a?(Integer)
+  #
+  #   return cmp([left], right) if left.is_a?(Integer) && right.is_a?(Array)
+  #
+  #   return cmp(left, [right]) if left.is_a?(Array) && right.is_a?(Integer)
+  #
+  #   return true if left.empty?
+  #
+  #   return false if right.empty?
+  #
+  #   l = left.shift
+  #   r = right.shift
+  #
+  #   puts "checkints #{l} #{r}"
+  #   return false if !cmp(l, r)
+  #   puts "reroll #{left} #{right}"
+  #
+  #   cmp(left, right)
+  # end
+  #
+
+  def check_type(var)
+    var.is_a?(Integer) ? :int : :arr
+  end
+
+  # cmp
+  # -----
+  # left & right are lists
+  # 
+  # cmp operates like <=>
+  #   for left <=> right
+  #   returning -1 if left  < right
+  #              0 if left == right
+  #              1 if left >  right
+  #
+  def cmp(left, right)
+    puts "cmp #{left}, #{right}"
+
+    return  0 if left.empty? && right.empty?
+    return -1 if left.empty?
+    return  1 if right.empty?
+
+    l = left.shift
+    r = right.shift
+
+    cmp_first = case [check_type(l), check_type(r)]
+                when %i[int arr]
+                  cmp([l], r)
+
+                when %i[arr int]
+                  cmp(l, [r])
+
+                when %i[arr arr]
+                  cmp(l, r)
+
+                when %i[int int]
+                  puts "#{l} <=> #{r}"
+                  l <=> r
+                end
+
+    puts "cmp_first #{cmp_first}"
+
+    return -1 if cmp_first == -1
+    return 1 if cmp_first == 1
+
+    cmp(left, right)
+  end
+
   def run
-    23
+    @list.map{|left, right|
+      c = cmp(left, right)
+      puts "RETURN: #{c}"
+      c
+    }.each_with_index
+        .map{|r, n| [r, n]}
+        .filter{|r, _| r == -1}
+        .map{|_, n| n + 1}
+        .reduce(&:+)
   end
 end
