@@ -3,35 +3,26 @@
 # Annoying List
 class DistressSignal
   def initialize(list)
-    @list = list.each_slice(2).map{|a, b|
-      [a, b].map{|string|
-        #eval(string)
-        the_lesser_of_two_evals(string)
-      }
+    @list = list.map{|string|
+      #eval(string)
+      the_lesser_of_two_evals(string.chars).first
     }
-    #p @list
+    #@list.each{|e| puts e.to_s}
   end
 
   # Formerly known as 'parse_packet', I realized that this
   # is absolutely useless. But since I wrote it and I was
   # needlessly proud of it, we're going to keep it.
   #
-  def the_lesser_of_two_evals(string)
-    l = string.chars.drop(1)
+  def the_lesser_of_two_evals(tokens)
+    list = []
 
-    parsed = parse_list(l.clone)
-    #puts "parsed #{parsed}"
-
-    parsed
-  end
-
-  def parse_list(tokens, list = [])
     until tokens.empty?
       head = tokens.shift
 
       case head
       when '['
-        list.append(parse_list(tokens))
+        list.append(the_lesser_of_two_evals(tokens))
       when ']'
         return list
       when ','
@@ -42,6 +33,7 @@ class DistressSignal
           n += head
           head = tokens.shift
         end
+        tokens.unshift(head)
         list.append(n.to_i)
       end
     end
@@ -60,7 +52,7 @@ class DistressSignal
   # cmp
   # -----
   # left & right are lists
-  # 
+  #
   # cmp operates like <=>
   #   for left <=> right
   #   returning -1 if left  < right
@@ -74,8 +66,8 @@ class DistressSignal
     return -1 if left.empty?
     return  1 if right.empty?
 
-    l = left.shift
-    r = right.shift
+    l = left.first
+    r = right.first
 
     cmp_first = case [check_type(l), check_type(r)]
                 when %i[int arr]
@@ -97,12 +89,12 @@ class DistressSignal
     return -1 if cmp_first == -1
     return 1 if cmp_first == 1
 
-    cmp(left, right)
+    cmp(left.clone.drop(1), right.clone.drop(1))
   end
 
   def run
-    @list.map{|left, right|
-      cmp(left, right)
+    @list.each_slice(2).map{|left, right|
+      cmp(left.clone, right.clone)
     }.map{|c|
       #puts "RETURN: #{c}"
       c
@@ -112,5 +104,17 @@ class DistressSignal
          .filter{|r, _| r == -1}
          .map{|_, n| n + 1}
          .reduce(&:+)
+  end
+
+  def decoder_key
+    # Add the divider packets
+    dividers = ['[[2]]', '[[6]]']
+    dividers.each{|div| @list.append(the_lesser_of_two_evals(div.chars).first)}
+
+    @list.sort{|a, b| cmp(a, b)}.map(&:to_s)
+         .each_with_index.map{|e, i| [e, i + 1]}
+         .filter{|e, _| dividers.include?(e)}
+         .map{|_, i| i}
+         .reduce(&:*)
   end
 end
