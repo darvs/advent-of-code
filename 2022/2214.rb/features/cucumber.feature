@@ -8,4 +8,4 @@ Feature:
 
 	Scenario: Part 1
 	    Given the content of file '2214.in'
-      Then 0 units of sand rest before falling into the abyss. 
+      Then 873 units of sand rest before falling into the abyss. 

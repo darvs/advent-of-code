@@ -28,19 +28,7 @@ class Point
     "p[#{x},#{y}]"
   end
 
-  def to_a
-    [x, y]
-  end
-
-  # def ==(other)
-  #   @x == other.x && @y == other.y
-  # end
-  #
-  # def ===(other)
-  #   @x == other.x && @y == other.y
-  # end
-  #
-
+  # eql? and hash are used to see if an item is in a Set
   def eql?(other)
     (@x == other.x) && (@y == other.y)
   end
@@ -49,6 +37,7 @@ class Point
     to_s.hash
   end
 
+  # the spaceship operator is used to sort the Set
   def <=>(other)
     cmp_x = (@x <=> other.x)
     return cmp_x unless cmp_x.zero?
@@ -63,8 +52,8 @@ class Regolith
     @set = Set.new
     list.each{|line| parse_line(line)}
 
-    @set.each{|p| puts p}
-    puts '----------'
+    #@set.each{|p| puts p}
+    #puts '----------'
   end
 
   def parse_line(string)
@@ -92,47 +81,30 @@ class Regolith
     new(File.readlines(File.join('data', filename)).map(&:chomp))
   end
 
-  # def top(pt)
-  #   [pt[0], pt[1] - 1]
-  # end
-  #
-  # def downleft(pt)
-  #   [pt[0] - 1, pt[1] + 1]
-  # end
-  #
-  # def downright(pt)
-  #   [pt[0] + 1, pt[1] + 1]
-  # end
-  #
-
-  def fall(pt, n = 0)
-    puts "fallin #{pt}, #{n}"
+  def fall(pt)
+    #puts "fallin #{pt}"
     # What did we hit?
     hit = @set.select{|h| h.x == pt.x && h.y >= pt.y}
 
     # We're falling into the void!
-    return n if hit.empty?
+    return false if hit.empty?
 
     # We've fallen on top of the one we hit
     fallen_to = hit.sort.first.top
 
-    p "hit #{hit} fallen_to #{fallen_to}"
-
-    p "fallen_to.down.left = #{fallen_to.down.left}, include? #{@set.include?(fallen_to.down.left)}"
-
     # Can we fall to the left?
-    return fall(fallen_to.down.left, n) unless @set.include?(fallen_to.down.left)
+    return fall(fallen_to.down.left) unless @set.include?(fallen_to.down.left)
 
     # Can we fall to the right?
-    return fall(fallen_to.down.right, n) unless @set.include?(fallen_to.down.right)
+    return fall(fallen_to.down.right) unless @set.include?(fallen_to.down.right)
 
     # Our fall has been stopped
     @set.add(fallen_to)
-    p "new set: #{@set}"
-    fall(Point.new(500, 0), n + 1)
+
+    true
   end
 
   def rest
-    fall(Point.new(500, 0))
+    0.step{|n| return n unless fall(Point.new(500, 0))}
   end
 end
