@@ -7,3 +7,7 @@ end
 Then(/^(\d+) units of sand rest before falling into the abyss\.$/) do |arg1|
   expect(Regolith.from_file(@filename).rest).to eq(arg1)
 end
+
+Then(/^(\d+) units of sand fall before filling the room\.$/) do |arg1|
+  expect(Regolith.from_file(@filename).fill).to eq(arg1)
+end
