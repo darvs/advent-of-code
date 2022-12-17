@@ -59,8 +59,10 @@ class Sensor
 end
 
 class Ranges
-  def initialize
-    @parts = []
+  attr_reader :parts
+
+  def initialize(val = [])
+    @parts = val
   end
 
   def union(pair)
@@ -84,7 +86,7 @@ class Ranges
       second = @parts.shift
 
       # overlap
-      if second[0] < current[1] + 1
+      if current[1] + 1 >= second[0]
         current = [[current[0], second[0]].min, [current[1], second[1]].max]
       else
         processed.append(current)
@@ -98,7 +100,7 @@ class Ranges
   def difference(pair)
     return if @parts.empty?
 
-    p "differences #{@parts} - #{pair}"
+    #p "differences #{@parts} - #{pair}"
 
     processed = []
     @parts.each{|current|
@@ -130,7 +132,31 @@ class Ranges
     }
     @parts = processed
 
-    p "differences end #{@parts}"
+    #p "differences end #{@parts}"
+  end
+
+  def difference_range(other_parts)
+    # p "difference_range #{other_parts}"
+    other_parts.map{|r| difference(r)}
+    @parts
+  end
+
+  def intersection(pair)
+    return if @parts.empty?
+
+    processed = []
+    @parts.each{|current|
+      # current is before intersection
+      next if current[1] < pair[0]
+
+      # current is after intersection
+      next if current[0] > pair[1]
+
+      # current is inside intersection
+      processed.append([[current[0], pair[0]].max, [current[1], pair[1]].min])
+    }
+
+    @parts = processed
   end
 
   def coverage
@@ -152,8 +178,8 @@ class AllBeacons
     @bacons = Set.new
     @sensors = {}
     list.each{|line| parse(line)}
-    p @bacons
-    p @sensors
+    #p @bacons
+    #p @sensors
   end
 
   def parse(line)
@@ -173,37 +199,36 @@ class AllBeacons
 
   # Number of spaces where a beacon cannot be present on row(n)
   def row(r)
-    # coverage = Set.new
     ranges = Ranges.new
     @sensors.sort.each{|loc, sen|
       range_at_r = sen.range - (loc.y - r).abs
-      if range_at_r >= 0
-        # (0..range_at_r).each{|n|
-        #   coverage.add(Point.new(loc.x - n, r))
-        #   coverage.add(Point.new(loc.x + n, r))
-        # }
-        #
-        ranges.union([loc.x - range_at_r, loc.x + range_at_r])
-      end
+      next if range_at_r.negative?
+
+      ranges.union([loc.x - range_at_r, loc.x + range_at_r])
     }
 
-    p "ranges before difference #{ranges}"
+    ranges
+  end
+
+  def coverage(r)
+    ranges = row(r)
 
     @bacons.filter{|b| b.y == r}.each{|b|
-      #coverage.delete(b)
       ranges.difference([b.x, b.x])
     }
 
     @sensors.filter{|k, _| k.y == r}.each_key{|s|
-      #coverage.delete(s)
       ranges.difference([s.x, s.x])
     }
 
-    #p "coverage #{coverage}"
-    p "ranges #{ranges}"
-    p "ranges coverage #{ranges.coverage}"
-
-    #coverage.length
     ranges.coverage
+  end
+
+  def tuning_frequency(upper_limit)
+    (0..upper_limit).each_with_index.map{|r, i|
+      res = [i, Ranges.new([[0, upper_limit]]).difference_range(row(r).intersection([0, upper_limit])).first]
+      #puts "#{r}: #{res}"
+      res
+    }.reject{|_, v| v.nil?}.map{|y, x| 4_000_000 * x.first + y}.first
   end
 end
