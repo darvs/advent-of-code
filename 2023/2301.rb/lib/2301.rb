@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+def test
+  0
+end
+
 # Trebuchet
 class Trebuchet
   def initialize(list)
@@ -11,18 +15,16 @@ class Trebuchet
       .map(&:strip))
   end
 
-  def sum
-    @list.map { |elem| elem.chars.filter { |c| c.match?('\d') } }
-         .map { |num_list| (num_list[0] + num_list[-1]).to_i }.sum
+  def sum(sum_list = @list)
+    sum_list.map { |elem| elem.chars.filter { |c| c.match?('\d') } }
+            .map { |num_list| (num_list[0] + num_list[-1]).to_i }.sum
   end
 
   def sum_with_replacements
-    @list = @list.map { |elem| replace(elem) }
-    puts @list
-    sum
+    sum(@list.map { |elem| replace(elem) })
   end
 
-  def replace(str, repl='')
+  def replace(str, repl = '')
     return repl if str.empty?
 
     %w[one two three four five six seven eight nine]
