@@ -15,14 +15,12 @@ class Cubes
   def parse(line)
     game, reveals = line.split(':')
     game_num = game.split(' ').last.to_i
-    puts "game #{game_num}"
 
     list = []
 
-    reveals.split(';').each{ |v|
-      puts "v #{v}"
+    reveals.split(';').each { |v|
       color_hash = Hash.new(0)
-      v.split(',').each{ |c|
+      v.split(',').each { |c|
         num, color = c.split(' ')
         color_hash[color] = num.to_i
       }
@@ -33,7 +31,6 @@ class Cubes
   end
 
   def sum
-    puts @hash
     @hash.keys.filter { |k|
       @hash[k].all? { |v| v['red'] <= 12 and v['green'] <= 13 and v['blue'] <= 14 }
     }.sum
@@ -43,12 +40,10 @@ class Cubes
     @hash.keys.map { |game|
       max = Hash.new(0)
       @hash[game].each { |reveal|
-        reveal.map { |color, v|
-          puts "color #{color} v #{v}"
-          max[color] = [max[color], v].max
+        reveal.map { |color, num|
+          max[color] = [max[color], num].max
         }
       }
-      puts "max #{max}"
       %w[red green blue].map { |c| max[c] }.reduce(&:*)
     }.sum
   end
