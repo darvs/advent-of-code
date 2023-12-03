@@ -23,11 +23,8 @@ class Schematic
   def scan_symbols
     @lines.each.with_index { |l, line_num|
       l.chars.map.with_index.reject { |sym, _|
-        [('0'..'9').to_a, '.'].flatten.include?(sym) }
-        .each { |sym, pos|
-          #@symbols[line_num][pos] = sym
-          @symbols += [[line_num, pos, sym]]
-        }
+        [('0'..'9').to_a, '.'].flatten.include?(sym)
+      }.each { |sym, pos| @symbols += [[line_num, pos, sym]] }
     }
   end
 
@@ -38,16 +35,16 @@ class Schematic
   #
   def scan_parts
     @lines.each.with_index { |l, line_num|
-      l.to_enum(:scan, /\d+/).map { 
+      l.to_enum(:scan, /\d+/).map {
         m = Regexp.last_match
-        @parts += [[line_num, m.offset(0)[0], m[0] ]]
+        @parts += [[line_num, m.offset(0)[0], m[0]]]
       }
     }
   end
 
   def filter_parts_with_nearby_symbol_in_list(symbol_list)
     @parts.filter { |px, py, part|
-      symbol_list.any? { |sx, sy, _| 
+      symbol_list.any? { |sx, sy, _|
         sx.between?(px - 1, px + 1) and sy.between?(py - 1, py + part.length)
       }
     }
