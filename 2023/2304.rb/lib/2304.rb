@@ -31,16 +31,18 @@ class Scratchcards
   end
 
   def total_worth
-    @lines.map { |line| score_line(scan_line(line)) }.sum
+    @lines.map { |line| scan_line(line) }
+          .map { |scanned| score_line(scanned) }
+          .sum
   end
 
   def number_of_cards
-    number_of_matches = @lines.map { |line| number_of_matches(scan_line(line)) }
+    number_of_matches = @lines.map { |line| scan_line(line) }.map { |scanned| number_of_matches(scanned) }
     number_of_cards = number_of_matches.length
     copies = Array.new(number_of_cards, 1)
 
     number_of_matches.map.with_index { |matches, i|
-      (1.. matches).map { |n| n + i }.select { |n| n < number_of_cards }
+      (1..matches).map { |n| n + i }.select { |n| n < number_of_cards }
         .each { |n| copies[n] += copies[i] }
     }
 
