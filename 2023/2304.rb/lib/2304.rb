@@ -3,7 +3,7 @@
 # Scratchcards
 class Scratchcards
   def initialize(lines)
-    @lines = lines
+    @lines = Array.new(lines)
   end
 
   def self.from_file(filename)
@@ -14,7 +14,7 @@ class Scratchcards
   def scan_line(line)
     header, cards = line.split(':')
     card_num = header.scan(/\d+/)[0].to_i
-    winning, have = cards.split('|').map { |str| str.scan(/\d+/).map(&:to_i).to_set }
+    winning, have = cards.split('|').map{|str| str.scan(/\d+/).map(&:to_i).to_set}
     [card_num, winning, have]
   end
 
@@ -31,19 +31,17 @@ class Scratchcards
   end
 
   def total_worth
-    @lines.map { |line| scan_line(line) }
-          .map { |scanned| score_line(scanned) }
-          .sum
+    @lines.map(&method(:scan_line)).map(&method(:score_line)).sum
   end
 
   def number_of_cards
-    number_of_matches = @lines.map { |line| scan_line(line) }.map { |scanned| number_of_matches(scanned) }
+    number_of_matches = @lines.map(&method(:scan_line)).map(&method(:number_of_matches))
     number_of_cards = number_of_matches.length
     copies = Array.new(number_of_cards, 1)
 
-    number_of_matches.map.with_index { |matches, i|
-      (1..matches).map { |n| n + i }.select { |n| n < number_of_cards }
-        .each { |n| copies[n] += copies[i] }
+    number_of_matches.map.with_index {|matches, i|
+      (1..matches).map {|n| n + i}.select {|n| n < number_of_cards}
+                  .each {|n| copies[n] += copies[i]}
     }
 
     copies.sum
