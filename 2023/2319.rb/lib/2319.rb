@@ -7,6 +7,11 @@ class Generator
   def initialize(lines)
     @lines = Array.new(lines)
     @program = []
+
+    code('#include "stdio.h"')
+    code('long accepted = 0;')
+    parse_instructions
+    parse_calls
   end
 
   def self.from_file(filename)
@@ -16,7 +21,6 @@ class Generator
 
   def code(str)
     @program.append(str)
-    @file.puts(str)
   end
 
   def parse_instruction_part(part)
@@ -42,7 +46,6 @@ class Generator
       label, rest = l.split('{')
       instructions, = rest.split('}')
       code("  #{label}:")
-      puts "label #{label} instructions #{instructions}"
       instructions.split(',').each{|part| parse_instruction_part(part)}
     }
 
@@ -75,22 +78,13 @@ class Generator
       Dir.chdir(tmp) {
         filename = '2319.c'
         File.open(filename, 'w') {|file|
-          @file = file
-
-          code('#include "stdio.h"')
-          code('long accepted = 0;')
-          parse_instructions
-          parse_calls
+          @program.each{|l|
+            #puts(l)
+            file.puts(l)
+          }
         }
 
-        puts '----------------------------------------------------'
-        @program.each{|l| puts l}
-        puts '----------------------------------------------------'
-
-        puts `pwd; ls -lah`
-
-        stdout, = Open3.capture2('cat 2319.c')
-        puts "program #{stdout}"
+        #puts `pwd; ls -lah`
 
         stdout, = Open3.capture2('gcc -o 2319 2319.c')
         puts "compile #{stdout}"
