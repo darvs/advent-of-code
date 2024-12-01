@@ -76,4 +76,3 @@ class Treehouse
     }.flatten.max
   end
 end
-

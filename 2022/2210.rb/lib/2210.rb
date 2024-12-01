@@ -6,7 +6,10 @@ class Crt
     @list = list.map{|line| parse(line)}
     @x = 1
     @pc = 1
+
+    # triggers when values changes
     @value_changes = {}
+
     @value_changes[0] = 1
   end
 

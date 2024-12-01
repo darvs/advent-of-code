@@ -17,4 +17,13 @@ class Locations
       (a - b).abs
     }.sum
   end
+
+  def sum_of_occurences
+    nums, rest = *@lists
+    hashi = rest.each_with_object(Hash.new(0)) {|item, h|
+      h[item] += 1
+    }
+    nums.map{|n| n * hashi[n]}.sum
+    
+  end
 end
