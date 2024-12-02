@@ -11,30 +11,31 @@ class Reports
       .map(&:strip))
   end
 
-  def safe(dampen=false)
-    @list.map{|l| dampened_safe(l, dampen)}.sum
+  def safe(dampen = false)
+    @list.map{|l| dampened_safe(l, dampen)}.filter{|ret| ret}.count
   end
 
   def dampened_safe(l, dampen)
     is_safe = safe_line(l)
-    return is_safe if is_safe == 1 || !dampen
+    return is_safe if is_safe || !dampen
 
     (0..(l.length - 1)).to_a.each {|p|
       new_l = l.dup
       new_l.delete_at(p)
 
-      return 1 if safe_line(new_l) == 1
+      return true if safe_line(new_l)
     }
-    return 0
+    false
   end
 
   def safe_line(line)
     pos_diff = line.each_cons(2).map{|a, b|
-      return 0 unless (a - b).abs.between?(1, 3)
+      return false unless (a - b).abs.between?(1, 3)
 
-      (b - a).positive? ? 1 : 0
-    }.sum
+      (b - a).positive?
+    }.filter{|ret| ret}.count
 
-    (pos_diff.zero? or (pos_diff == (line.length - 1))) ? 1 : 0
+    # Are they either all decreasing or all increasing
+    pos_diff.zero? or pos_diff == (line.length - 1)
   end
 end
