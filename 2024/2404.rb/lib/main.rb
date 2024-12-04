@@ -50,4 +50,22 @@ class Program
       dx.abs <= 1 && dy.abs <= 1 ? [mx, my] : nil
     }.reject(&:nil?)
   end
+
+  def run_crossmasses
+    @letters['A'].map{|pair|
+      ax, ay = *pair
+
+      top_left = [ax - 1, ay - 1]
+      top_right = [ax + 1, ay - 1]
+      bot_left = [ax - 1, ay + 1]
+      bot_right = [ax + 1, ay + 1]
+
+      ((@coords[top_left] == 'M' && @coords[bot_right] == 'S') ||
+       (@coords[top_left] == 'S' && @coords[bot_right] == 'M')
+      ) &&
+        ((@coords[top_right] == 'M' && @coords[bot_left] == 'S') ||
+         (@coords[top_right] == 'S' && @coords[bot_left] == 'M')
+        )
+    }.select{|v| v}.count
+  end
 end

@@ -7,3 +7,7 @@ end
 Then(/^the result is (\d+)$/) do |arg1|
   expect(@p.run).to eq(arg1)
 end
+
+Then(/^there are (\d+) crossmasses$/) do |arg1|
+  expect(@p.run_crossmasses).to eq(arg1)
+end

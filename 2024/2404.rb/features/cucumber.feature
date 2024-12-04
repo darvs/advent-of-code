@@ -14,4 +14,10 @@ Feature: XXXXXXXXXXXXXXXXX
 		Given the values in file 'full.in'
     Then the result is 2406
 
+	Scenario: Part 2 smol
+		Given the values in file 'smol.3.in'
+    Then there are 9 crossmasses
 
+	Scenario: Part 2 full
+		Given the values in file 'full.in'
+    Then there are 1807 crossmasses
