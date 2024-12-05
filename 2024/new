@@ -21,19 +21,24 @@ PROJ="${BASE}/${1}"
 mkdir -p "${PROJ}"
 mkdir -p "${PROJ}"/lib
 mkdir -p "${PROJ}"/data
+#mkdir -p "${PROJ}"/features
+#mkdir -p "${PROJ}"/features/step_definitions
+#mkdir -p "${PROJ}"/features/support
 
 cd "${PROJ}"
 cucumber --init
 cd "${BASE}"
 
-from_template "features/cucumber.feature" "cucumber.feature"
+from_template "features/cucumber.feature" cucumber.feature
 
 from_template "Makefile" "Makefile"
-from_template "features/step_definitions/cucumber_steps.rb" frozen_string_literal.rb
-from_template "lib/${ARG}" frozen_string_literal.rb
+from_template "features/step_definitions/cucumber_steps.rb" cucumber_steps.rb
+
+from_template "lib/main.rb" main.rb
 from_template "features/support/env.rb" env.rb
 
-touch "${PROJ}"/data/"${NOEXT}".in
+touch "${PROJ}"/data/smol.in
+touch "${PROJ}"/data/full.in
 
 [[ ! -z ${COPY} ]] && cp -Rv "${COPY}/features" "${PROJ}"
 [[ ! -z ${COPY} ]] && cp "${COPY}/lib"/*.rb "${PROJ}/lib/${1}"
