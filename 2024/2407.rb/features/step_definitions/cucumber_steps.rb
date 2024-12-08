@@ -7,3 +7,7 @@ end
 Then(/^the result is (\d+)$/) do |arg1|
   expect(@p.run).to eq(arg1)
 end
+
+When(/^we use concatenation as well$/) do
+  @p.use_concatenation
+end
