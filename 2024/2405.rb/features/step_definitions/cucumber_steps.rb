@@ -7,3 +7,7 @@ end
 Then(/^the result is (\d+)$/) do |arg1|
   expect(@p.run).to eq(arg1)
 end
+
+Then(/^the fixed result is (\d+)$/) do |arg1|
+  expect(@p.fix).to eq(arg1)
+end
